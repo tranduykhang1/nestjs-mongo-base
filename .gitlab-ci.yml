@@ -6,9 +6,6 @@ stages:
   - unit_test
   - build
 
-variables:
-  CONTAINER_NAME: example_api
-
 install_job:
   stage: install
   script:
