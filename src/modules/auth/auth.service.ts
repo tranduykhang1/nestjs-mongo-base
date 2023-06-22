@@ -17,6 +17,7 @@ export class AuthService {
   }
 
   async login(input: LoginDto): Promise<BaseResponse<TokenResponse>> {
+    console.log(input);
     const payload: ITokenPayload = {
       uid: '0',
       iss: 'example',

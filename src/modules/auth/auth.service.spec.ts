@@ -1,11 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { appConfig } from 'src/app.config';
-import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login-dto';
-import { RegisterDto } from './dto/register-dto';
 
 describe('AuthService', () => {
   let service: AuthService;

@@ -57,7 +57,7 @@ export class User extends BaseObject {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.set('toJSON', {
-  transform: function (doc, res, _) {
+  transform: function (doc, res) {
     delete res.password;
     delete res.key;
     return res;

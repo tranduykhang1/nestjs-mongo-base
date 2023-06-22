@@ -1,14 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsIn,
-  IsInt,
-  IsOptional,
-  IsString,
-  Min,
-} from 'class-validator';
-import { ESortField, ESortOrder } from '../enum/sort.enum';
 import { Type } from 'class-transformer';
+import { IsEnum, IsOptional, IsString, Min } from 'class-validator';
+import { ESortField, ESortOrder } from '../enum/sort.enum';
 
 export class DefaultListDto {
   @ApiProperty({
