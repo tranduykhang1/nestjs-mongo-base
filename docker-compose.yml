@@ -2,7 +2,7 @@ version: '3'
 
 services:
   api:
-    container_name: boo_oong_api
+    container_name: example_api
     build: .
     command: npm run start:dev
     restart: always
@@ -10,21 +10,11 @@ services:
       - $API_PORT:3000
     volumes:
       - .:/home/app
-    environment:
-      - JWT_SECRET
-      - MONGO_URI
-      - APP_NAME
-      - APP_VERSION
-      - API_VERSION
-      - FILE_HOST
-      - FILE_ROOT
-      - AT_EXPIRE
-      - RT_EXPIRE
-      - PW_SECRET
-      - BASE_URL
+    env_file:
+      - ./.env
 
   db:
-    container_name: boo_oong_db
+    container_name: example_db
     image: mongo
     restart: always
     environment:
@@ -35,7 +25,7 @@ services:
       - db:/data/db
 
   admin:
-    container_name: boo_oong_db_admin
+    container_name: example_db_admin
     image: mongo-express
     restart: always
     ports:
@@ -48,7 +38,7 @@ services:
       - db
 
   files:
-    container_name: boo_oong_db_file
+    container_name: example_db_file
     image: nginx:alpine
     restart: always
     volumes:

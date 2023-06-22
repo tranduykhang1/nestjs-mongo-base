@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
@@ -14,7 +15,7 @@ import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
-    // Make it look good and work well
+    ConfigModule.forRoot(),
     MongooseModule.forRoot(appConfig.mongoURI),
     AuthModule,
     UsersModule,

@@ -1,39 +1,25 @@
 import { HttpStatus } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { MongooseModule } from '@nestjs/mongoose';
-import { PassportModule } from '@nestjs/passport';
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { appConfig } from '../../app.config';
-import { User, UserSchema } from '../users/schemas/user.schema';
-import { UsersModule } from '../users/users.module';
+import { appConfig } from 'src/app.config';
+import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login-dto';
 import { RegisterDto } from './dto/register-dto';
-import { JwtStrategy } from './jwt.strategy';
-import { AdministratorModule } from '../administrator/administrator.module';
-import { MasterUserModule } from '../master-user/master-user.module';
-import { ConfigTest } from 'test/config.test';
 
 describe('AuthService', () => {
   let service: AuthService;
 
+  const jwtServiceProvider = {
+    provide: JwtService,
+    useFactory: () => ({
+      sign: jest.fn().mockReturnValueOnce('token'),
+    }),
+  };
+
   beforeEach(async () => {
-    new ConfigTest();
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        MongooseModule.forRoot(appConfig.mongoURI),
-        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-        UsersModule,
-        PassportModule,
-        AdministratorModule,
-        MasterUserModule,
-        JwtModule.register({
-          secret: appConfig.jwtSecret,
-          signOptions: {
-            expiresIn: appConfig.jwtExpiresIn,
-          },
-        }),
-      ],
-      providers: [AuthService, JwtStrategy],
+      providers: [AuthService, jwtServiceProvider],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
@@ -44,14 +30,14 @@ describe('AuthService', () => {
   });
 
   it('should be register a new account', async () => {
-    const input: RegisterDto = {
+    const input: LoginDto = {
       loginId: 'test1@test.com',
       password: '123123123',
-      displayName: 'Test user',
     };
 
-    const res = await service.register(input);
+    const res = await service.login(input);
 
-    expect(res.statusCode).toEqual(HttpStatus.CREATED);
+    expect(res.statusCode).toEqual(HttpStatus.OK);
+    expect(res.message).toEqual('Success');
   });
 });

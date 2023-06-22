@@ -5,16 +5,19 @@ import { BaseResponse } from '../responses/base.response';
 import { BaseObject } from '../schemas/base-object.schema';
 import { SoftDeleteModel } from 'soft-delete-mongoose-plugin';
 import { joinUser } from '../pipelines/join-user';
+import { appConfig } from 'src/app.config';
 
 export abstract class BaseService<T extends BaseObject> {
   private readonly modelName: string;
   private readonly serviceLogger = new Logger(BaseService.name);
 
   constructor(private readonly model: SoftDeleteModel<HydratedDocument<T>>) {
-    for (const modelName of Object.keys(model.collection.conn.models)) {
-      if (model.collection.conn.models[modelName] === this.model) {
-        this.modelName = modelName;
-        break;
+    if (appConfig.env !== 'test') {
+      for (const modelName of Object.keys(model.collection.conn.models)) {
+        if (model.collection.conn.models[modelName] === this.model) {
+          this.modelName = modelName;
+          break;
+        }
       }
     }
   }
