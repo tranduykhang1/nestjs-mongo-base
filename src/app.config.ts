@@ -1,0 +1,16 @@
+export const appConfig = {
+  name: process.env.APP_NAME,
+  version: process.env.APP_VERSION,
+  apiVersion: process.env.API_VERSION,
+  mongoURI: process.env.MONGO_URI,
+  jwtExpiresIn: process.env.AT_EXPIRE,
+  jwtSecret: process.env.JWT_SECRET,
+  jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
+  jwtRefreshExp: process.env.RT_EXPIRE,
+  fileHost: process.env.FILE_HOST,
+  fileRoot: process.env.FILE_ROOT,
+  pwSecret: process.env.PW_SECRET,
+  baseUrl: process.env.BASE_URL,
+  googleClientID: process.env.GOOGLE_CLIENT_ID,
+  googleSecretKey: process.env.GOOGLE_SECRET_KEY,
+};
