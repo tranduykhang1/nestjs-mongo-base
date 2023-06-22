@@ -1,10 +1,9 @@
-
 image: node:16-slim
 
 services:
   - docker:dind
 
-stages: 
+stages:
   - install
   - unit_test
   - build
@@ -21,7 +20,7 @@ install_job:
 
 unit_test_job:
   stage: unit_test
-  script: 
+  script:
     - npm run test
 
 build_job:
@@ -39,10 +38,9 @@ build_job:
         tag=":$CI_COMMIT_REF_SLUG"
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
-    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" -f Dockerfile.pro .
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" -f Dockerfile .
     - docker push "$CI_REGISTRY_IMAGE${tag}"
   rules:
     - if: $CI_COMMIT_BRANCH
       exists:
         - Dockerfile
-
