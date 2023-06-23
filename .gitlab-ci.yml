@@ -35,7 +35,7 @@ build_job:
   dependencies:
     - unit_test_job
   script:
-    - docker build -t $TAG_COMMIT -t $TAG_LATEST .
+    - docker build -t $TAG_COMMIT -t $TAG_LATEST -f Dockerfile.Pro .
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker push $TAG_COMMIT
     - docker push $TAG_LATEST

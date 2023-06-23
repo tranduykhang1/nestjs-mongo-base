@@ -3,7 +3,8 @@ version: '3'
 services:
   api:
     container_name: example_api
-    build: .
+    # build: .
+    image: registry.gitlab.com/demo5980425/cicd-demo/config/cicd:898be895
     command: npm run start:dev
     restart: always
     ports:
