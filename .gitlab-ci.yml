@@ -40,6 +40,6 @@ build_job:
     - docker push $TAG_COMMIT
     - docker push $TAG_LATEST
   rules:
-    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_SHORT_SHA
       exists:
         - Dockerfile.pro
