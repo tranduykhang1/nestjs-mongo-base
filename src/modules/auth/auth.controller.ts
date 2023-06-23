@@ -15,7 +15,7 @@ export class AuthController {
   @ApiCreatedResponse({
     type: SwgCreatedREsponse<null>,
   })
-  @Post()
+  @Post('/login')
   create() {
     return;
   }
