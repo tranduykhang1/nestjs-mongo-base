@@ -1,0 +1,45 @@
+image: node:16-slim
+
+services:
+  - docker:dind
+
+stages:
+  - install
+  - unit_test
+  - build
+
+variables:
+  TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
+  TAG_COMMIT: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
+
+cache:
+  paths:
+    - node_modules/
+
+install_job:
+  stage: install
+  script:
+    - npm install
+    - npm run lint
+
+unit_test_job:
+  stage: unit_test
+  script:
+    - npm run test
+
+build_job:
+  image: docker:latest
+  stage: build
+  needs:
+    - unit_test_job
+  dependencies:
+    - unit_test_job
+  script:
+    - docker build -t $TAG_COMMIT -t $TAG_LATEST -f Dockerfile.pro .
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker push $TAG_COMMIT
+    - docker push $TAG_LATEST
+  rules:
+    - if: $CI_COMMIT_SHORT_SHA
+      exists:
+        - Dockerfile.pro
