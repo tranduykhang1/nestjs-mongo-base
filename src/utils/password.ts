@@ -6,8 +6,6 @@ import {
 } from 'crypto';
 import { appConfig } from '../app.config';
 
-// const scryptAsync = promisify(scrypt);
-
 const algorithm = 'aes-256-cbc';
 
 const encryptionIV = createHash('sha512')
@@ -56,24 +54,4 @@ export class Password {
       return err;
     }
   }
-
-  // static async hashPassword(password: string): Promise<string> {
-  //   const salt = randomBytes(16).toString('hex');
-  //   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-  //   return `${buf.toString('hex')}.${salt}`;
-  // }
-
-  // static async comparePassword(
-  //   storedPassword: string,
-  //   suppliedPassword: string,
-  // ): Promise<boolean> {
-  //   const [hashedPassword, salt] = storedPassword.split('.');
-  //   const hashedPasswordBuf = Buffer.from(hashedPassword, 'hex');
-  //   const suppliedPasswordBuf = (await scryptAsync(
-  //     suppliedPassword,
-  //     salt,
-  //     64,
-  //   )) as Buffer;
-  //   return timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
-  // }
 }

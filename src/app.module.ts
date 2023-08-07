@@ -7,6 +7,7 @@ import { SoftDelete } from 'soft-delete-mongoose-plugin';
 import { appConfig } from './app.config';
 import { HttpExceptionFilter } from './common/exceptions/http-filter.exception';
 import { AspectLogger } from './common/interceptors/log.interceptor';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AppLoggerMiddleware } from './common/middleware/logging.middleware';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
@@ -32,6 +33,10 @@ import { UsersModule } from './modules/users/users.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: AspectLogger,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
     },
     {
       provide: APP_GUARD,

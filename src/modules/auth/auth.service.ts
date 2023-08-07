@@ -25,8 +25,6 @@ export class AuthService {
       rol: 'ADMIN',
     };
     return {
-      statusCode: HttpStatus.OK,
-      message: 'Success',
       data: this.signToken(payload),
     };
   }

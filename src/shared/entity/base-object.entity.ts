@@ -1,7 +1,7 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 
 @Schema({ timestamps: true })
-export class BaseObject {
+export class BaseEntity {
   _id: string;
 
   @Prop()

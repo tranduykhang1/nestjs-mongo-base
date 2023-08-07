@@ -2,13 +2,13 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument } from 'mongoose';
 import { EUserGender, EUserRole } from '../../../shared/enum/user.enum';
-import { BaseObject } from '../../../shared/schemas/base-object.schema';
 import { ELoginMethod, EUserStatus } from '../users.enum';
+import { BaseEntity } from 'src/shared/entity/base-object.entity';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
-export class User extends BaseObject {
+export class User extends BaseEntity {
   @Prop({ minlength: 3, maxlength: 30 })
   @ApiProperty()
   displayName: string;

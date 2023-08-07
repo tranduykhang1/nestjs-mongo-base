@@ -2,7 +2,7 @@ import { Controller, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from '../../modules/users/users.service';
 import { AuthService } from './auth.service';
-import { SwgCreatedREsponse } from 'src/shared/swagger-config/success-response.swg';
+import { SwgCreatedResponse } from 'src/shared/swagger-config/success-response.swg';
 
 @ApiTags('AUTH')
 @Controller('auth')
@@ -13,7 +13,7 @@ export class AuthController {
   ) {}
 
   @ApiCreatedResponse({
-    type: SwgCreatedREsponse<null>,
+    type: SwgCreatedResponse<null>,
   })
   @Post('/login')
   create() {

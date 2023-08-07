@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import { Model } from 'mongoose';
 import { Seeder } from 'nestjs-seeder';
-import { User } from '../modules/users/schemas/user.schema';
+import { User } from '../modules/users/entity/user.entity';
 import { EUserRole } from '../shared/enum/user.enum';
 import { Password } from '../utils/password';
 

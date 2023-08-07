@@ -2,7 +2,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { seeder } from 'nestjs-seeder';
 import { appConfig } from './app.config';
-import { User, UserSchema } from './modules/users/schemas/user.schema';
+import { User, UserSchema } from './modules/users/entity/user.entity';
 import { seeders } from './seeder';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

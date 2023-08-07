@@ -1,4 +1,3 @@
-import { HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
@@ -10,7 +9,7 @@ describe('AuthService', () => {
   const jwtServiceProvider = {
     provide: JwtService,
     useFactory: () => ({
-      sign: jest.fn().mockReturnValueOnce('token'),
+      sign: jest.fn().mockReturnValue(''),
     }),
   };
 
@@ -34,7 +33,9 @@ describe('AuthService', () => {
 
     const res = await service.login(input);
 
-    expect(res.statusCode).toEqual(HttpStatus.OK);
-    expect(res.message).toEqual('Success');
+    expect(res.data).toEqual({
+      at: '',
+      rt: '',
+    });
   });
 });

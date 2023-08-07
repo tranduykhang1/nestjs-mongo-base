@@ -14,6 +14,11 @@ const devEnv = {
   baseUrl: process.env.BASE_URL,
   googleClientID: process.env.GOOGLE_CLIENT_ID,
   googleSecretKey: process.env.GOOGLE_SECRET_KEY,
+  apiAuthUserName: process.env.API_AUTH_USERNAME,
+  apiAuthPassword: process.env.API_AUTH_PASSWORD,
+  maxWorkers: process.env.MAX_WORKERS,
+  throttleTTL: process.env.THROTTLE_TTL,
+  throttleLimit: process.env.THROTTLE_LIMIT,
 };
 
 const testEnv = {
@@ -29,6 +34,11 @@ const testEnv = {
   jwtRefreshExp: '7d',
   pwSecret: 'example',
   baseUrl: 'http://localhost:3003',
+  apiAuthUserName: process.env.API_AUTH_USERNAME,
+  apiAuthPassword: process.env.API_AUTH_PASSWORD,
+  maxWorkers: '1',
+  throttleTTL: process.env.THROTTLE_TTL,
+  throttleLimit: process.env.THROTTLE_LIMIT,
 };
 
 export const appConfig = process.env.NODE_ENV === 'test' ? testEnv : devEnv;

@@ -1,7 +1,7 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { User, UserDocument } from './schemas/user.schema';
+import { User, UserDocument } from './entity/user.entity';
 
 describe('UserService', () => {
   let service: UsersService;
