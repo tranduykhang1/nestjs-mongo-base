@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { BaseResponse } from 'src/shared/responses/base.response';
 import { LoginDto } from './dto/login-dto';
@@ -17,7 +17,6 @@ export class AuthService {
   }
 
   async login(input: LoginDto): Promise<BaseResponse<TokenResponse>> {
-    console.log(input);
     const payload: ITokenPayload = {
       uid: '0',
       iss: 'example',

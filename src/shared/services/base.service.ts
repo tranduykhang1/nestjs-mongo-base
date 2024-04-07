@@ -1,27 +1,17 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, PipelineStage } from 'mongoose';
 import { SoftDeleteModel } from 'soft-delete-mongoose-plugin';
 import { appConfig } from 'src/app.config';
 import { BaseEntity } from '../entity/base-object.entity';
 import { ESortField, ESortOrder } from '../enum/sort.enum';
-import { joinUser } from '../pipelines/join-user';
-import { BaseResponse } from '../responses/base.response';
+import { Nullable } from 'src/common/types/types';
 
 export abstract class BaseService<T extends BaseEntity> {
   private readonly modelName: string;
   private readonly serviceLogger = new Logger(BaseService.name);
 
   constructor(private readonly model: SoftDeleteModel<HydratedDocument<T>>) {
-    if (appConfig.env !== 'test') {
-      for (const modelName of Object.keys(model.collection.conn.models)) {
-        if (model.collection.conn.models[modelName] === this.model) {
-          this.modelName = modelName;
-          break;
-        }
-      }
-    } else {
-      this.modelName = 'TestModel';
-    }
+    this.modelName = appConfig.env !== 'test' ? model.modelName : 'TestModel';
   }
 
   async create(
@@ -29,342 +19,160 @@ export abstract class BaseService<T extends BaseEntity> {
     userId: string,
   ): Promise<T> {
     try {
-      const createInput = {
-        ...input,
-        createdBy: userId,
-      };
+      const createInput = { ...input, createdBy: userId };
       const createdData = await this.model.create(createInput);
-      if (createdData) return createdData;
-      throw new BadRequestException(
-        `CREATE_FAIL_FOR_${this.modelName.toLowerCase()}`,
-      );
-    } catch (err) {
-      this.serviceLogger.error(`Create failed ${this.modelName}:`);
-      this.serviceLogger.error(err);
-      if (err.code === 11000) {
+      if (!createdData)
         throw new BadRequestException(
-          `${Object.keys(err.keyValue).toString()} is existed`,
+          `CREATE_FAIL_FOR_${this.modelName.toLowerCase()}`,
         );
-      }
-      throw new BadRequestException(err);
-    }
-  }
-
-  async findOne(filter: Record<keyof T, any> | any): Promise<T | null> {
-    let result: any;
-    try {
-      result = await this.model.findOne(filter);
-
-      if (result) {
-        return result;
-      }
-
-      throw new BadRequestException(`${this.modelName} not found`);
+      return createdData;
     } catch (err) {
-      this.serviceLogger.error(`Could not find ${this.modelName}`);
-      this.serviceLogger.error(err);
-      throw new BadRequestException(`${this.modelName} not found`);
+      throw this.handleServiceError(err, 'Create');
     }
   }
 
-  async findLastOne(): Promise<T> {
-    return await this.model.findOne().sort({ $natural: -1 });
-  }
-
-  async findDeleted(filter: Record<keyof T, any> | any): Promise<T> {
-    return await this.model.findOne({
-      ...filter,
-      isDeleted: true,
-    });
-  }
-
-  async findWithoutError(
-    filter: Record<keyof T, any> | any,
-  ): Promise<T | null> {
-    const result = await this.model.findOne(filter);
-    return result;
-  }
-  async findIncludeField(pipe: string | any, field?: string): Promise<T> {
+  async findOne(filter: Record<keyof T, any> | any): Promise<Nullable<T>> {
     try {
-      const result = await this.model.findOne(pipe).select(field);
-      return result;
+      const result = await this.model.findOne(filter);
+      return result ?? null;
     } catch (err) {
-      this.serviceLogger.error(
-        `COULD_NOT_FIND_${this.modelName.toUpperCase()}`,
-      );
-      this.serviceLogger.error(err);
-      throw new BadRequestException(`${this.modelName} not found`);
+      throw this.handleServiceError(err, `FindOne ${this.modelName}`);
     }
   }
+
+  async findLastOne(): Promise<Nullable<T>> {
+    try {
+      return (await this.model.findOne().sort({ $natural: -1 })) ?? null;
+    } catch (err) {
+      throw this.handleServiceError(err, `FindLastOne ${this.modelName}`);
+    }
+  }
+
   async update(
     filter: Record<keyof T, any> | any,
     input: Partial<Record<keyof T, unknown>>,
     userId: string,
-    pipes = [],
-  ): Promise<T> {
+  ): Promise<Nullable<T>> {
     try {
-      const updateInput = {
-        ...input,
-        updatedBy: userId,
-      };
-
-      await this.findOne(filter);
-      await this.model.findByIdAndUpdate(
+      const updateInput = { ...input, updatedBy: userId };
+      const result = await this.model.findByIdAndUpdate(
         filter,
-        {
-          $set: updateInput,
-        },
-
+        { $set: updateInput },
         { new: true },
       );
-      const [res] = await this.queryAggregate(
-        [filter],
-        { limit: 1, offset: 0 },
-        pipes,
-      );
-      return res;
+      if (!result) throw new BadRequestException(`${this.modelName} not found`);
+      return result;
     } catch (err) {
-      this.serviceLogger.error(`Could not find ${this.modelName} entry:`);
-      this.serviceLogger.error({ err });
-      if (err.code === 11000) {
-        throw new BadRequestException(
-          `The ${Object.keys(err.keyValue)
-            .toString()
-            .toUpperCase()} is existed`,
-        );
-      }
-      throw new BadRequestException(`${this.modelName} not found`);
+      throw this.handleServiceError(err, `Update ${this.modelName}`);
     }
   }
 
-  async remove(
+  async softDelete(
     filter: Record<keyof T, any> | any,
     userId: string,
-  ): Promise<BaseResponse<T>> {
+  ): Promise<void> {
     try {
-      await this.findOne(filter);
-      await this.model.updateMany(
-        filter,
-        {
-          $set: {
-            deletedBy: userId,
-          },
-        },
-        { new: true },
-      );
-      await this.model.softDeleteOne(filter);
-      return;
+      const [foundDocument] = await Promise.all([
+        this.model.findOne(filter),
+        this.model.updateMany(
+          filter,
+          { $set: { deletedBy: userId } },
+          { new: true },
+        ),
+        this.model.softDeleteOne(filter),
+      ]);
+      if (!foundDocument)
+        throw new BadRequestException(`${this.modelName} not found`);
     } catch (err) {
-      this.serviceLogger.error(`Could not find ${this.modelName} entry:`);
-      this.serviceLogger.error(err);
-      throw new BadRequestException(`${this.modelName} not found`);
+      this.handleServiceError(err, `SoftDelete ${this.modelName}`);
     }
   }
 
-  async removeMany(
+  async softDeleteMany(
     filter: Record<keyof T, any> | any,
     userId: string,
-  ): Promise<BaseResponse<T>> {
+  ): Promise<void> {
     try {
-      await this.model.updateMany(
+      const { matchedCount } = await this.model.updateMany(
         filter,
-        {
-          $set: {
-            deletedBy: userId,
-          },
-        },
+        { $set: { deletedBy: userId } },
         { new: true },
       );
-      const { matchedCount } = await this.model.softDeleteMany(filter);
-      let res: BaseResponse<T> = {
-        statusCode: 200,
-        message: 'success',
-      };
-      if (matchedCount === 0) {
-        throw new BadRequestException('remove failed');
-      } else {
-        res = {
-          message: 'success',
-        };
-      }
-      return res;
+      if (matchedCount === 0) throw new BadRequestException('remove failed');
     } catch (err) {
-      throw new BadRequestException(err.message);
+      this.handleServiceError(err, `SoftDeleteMany ${this.modelName}`);
     }
   }
 
-  async delete(filter: Record<keyof T, any> | any): Promise<T> {
+  async delete(filter: Record<keyof T, any> | any): Promise<Nullable<T>> {
     try {
-      return await this.model.findByIdAndDelete(filter);
+      return (await this.model.findByIdAndDelete(filter)) ?? null;
     } catch (err) {
-      return err;
+      throw this.handleServiceError(err, `Delete ${this.modelName}`);
     }
   }
 
   async count(filter: any): Promise<number> {
-    const result: number = await this.model.count({ $and: filter });
-    return result || 0;
+    try {
+      return await this.model.countDocuments({ $and: filter });
+    } catch (err) {
+      throw this.handleServiceError(err, `Count ${this.modelName}`);
+    }
   }
 
-  async countAggregate(filter: any, pipe = []): Promise<number> {
-    const [result] = await this.model.aggregate([
-      {
-        $match: {
-          $and: filter,
-        },
-      },
-      ...joinUser('createdBy'),
-      ...joinUser('updatedBy'),
-      ...pipe,
-      { $count: 'count' },
-    ]);
-    return result ? result.count : 0;
+  async countAggregate(filter: any, pipe: PipelineStage[]): Promise<number> {
+    try {
+      const result = await this.model.aggregate([
+        { $match: { $and: filter } },
+        ...pipe,
+        { $count: 'count' },
+      ]);
+      return result.length > 0 ? result[0].count : 0;
+    } catch (err) {
+      throw this.handleServiceError(err, `CountAggregate ${this.modelName}`);
+    }
   }
 
-  async queryAggregate(
+  async query<M = T>(
     filter: any,
-    paginate: any,
+    paginate: {
+      sortField: ESortField;
+      sortOrder: ESortOrder;
+      offset: number;
+      limit: number;
+    },
     pipes: any[],
     secondSortField?: ESortField,
-  ): Promise<T[]> {
-    const { sortField, sortOrder, offset, limit } = paginate;
-    let secondSort = '_id';
-    const sortOrderNumber = sortOrder === ESortOrder.DESC ? -1 : 1;
-    if (secondSortField) {
-      secondSort = secondSortField;
-    }
-
-    const result = await this.model.aggregate([
-      {
-        $match: { $and: filter },
-      },
-      ...joinUser('createdBy'),
-      ...joinUser('updatedBy'),
-      ...pipes,
-      {
-        $project: {
-          password: 0,
-          key: 0,
-        },
-      },
-      {
-        $sort: {
-          [sortField]: sortOrderNumber,
-          [secondSort]: -1,
-        },
-      },
-      {
-        $limit: offset + limit,
-      },
-      {
-        $skip: offset,
-      },
-    ]);
-    return result;
-  }
-  async queryAggregatePaginateFirst(
-    filter: any,
-    paginate: any,
-    pipes: any[],
-  ): Promise<T[]> {
-    const { offset, limit, sortField, sortOrder } = paginate;
-
-    const sortOrderNumber = sortOrder === ESortOrder.DESC ? -1 : 1;
-    const result = await this.model.aggregate([
-      {
-        $match: { $and: filter },
-      },
-
-      {
-        $sort: {
-          [sortField]: sortOrderNumber,
-          _id: -1,
-        },
-      },
-
-      {
-        $limit: offset + limit,
-      },
-      {
-        $skip: offset,
-      },
-      ...pipes,
-      ...joinUser('createdBy'),
-      ...joinUser('updatedBy'),
-      {
-        $project: {
-          password: 0,
-          key: 0,
-        },
-      },
-    ]);
-    return result;
-  }
-
-  async baseQuery(
-    filter: any,
-    {
-      sortField = ESortField.CREATED_AT,
-      sortOrder = ESortOrder.DESC,
-      offset = 0,
-      limit = 99999 * 99999,
-    }: any,
-  ): Promise<T[] | any> {
-    const sortOrderNumber = sortOrder === ESortOrder.DESC ? -1 : 1;
-    const result: T[] = await this.model.aggregate([
-      { $match: { $and: filter } },
-      ...joinUser('createdBy'),
-      ...joinUser('updatedBy'),
-      // {
-      //   $project: {
-      //     userId: 0,
-      //     ownerId: 0,
-      //     password: 0,
-      //     key: 0,
-      //   },
-      // },
-      {
-        $sort: { [sortField]: sortOrderNumber, _id: 1 },
-      },
-      {
-        $limit: offset + limit,
-      },
-      {
-        $skip: offset,
-      },
-    ]);
-    return result;
-  }
-
-  async checkOwner(id: string, userId: string): Promise<void> {
-    const isOwner = await this.model.findOne({
-      _id: id,
-      createdBy: userId,
-    });
-    if (!isOwner) {
-      throw new BadRequestException('not owner');
-    }
-    return;
-  }
-
-  async permanentRemove(date: Date): Promise<any> {
+  ): Promise<{ items: M[]; total: number }> {
     try {
-      const { deletedCount } = await this.model.deleteMany(
-        {
-          $lte: date,
-          isDeleted: true,
-        },
-        {
-          rawResult: true,
-        },
-      );
+      const { sortField, sortOrder, offset, limit } = paginate;
+      const sortOrderNumber = sortOrder === ESortOrder.DESC ? -1 : 1;
+      const secondSort = secondSortField || '_id';
 
-      this.serviceLogger.log(':::::::::::::::::::::::::::::::::');
-      this.serviceLogger.log(`DELETED: ${deletedCount} in ${this.modelName}`);
-      return deletedCount;
+      const [items, total] = await Promise.all([
+        this.model.aggregate([
+          { $match: { $and: filter } },
+          ...pipes,
+          { $sort: { [sortField]: sortOrderNumber, [secondSort]: -1 } },
+          { $limit: offset + limit },
+          { $skip: offset },
+        ]),
+        this.countAggregate(filter, pipes),
+      ]);
+
+      return { items, total };
     } catch (err) {
-      this.serviceLogger.warn('CLEAN UP THE REMOVED DATA:::');
-      this.serviceLogger.warn(err.message);
+      throw this.handleServiceError(err, `Query ${this.modelName}`);
     }
+  }
+
+  private handleServiceError(err: any, operation: string): void {
+    this.serviceLogger.error(
+      `Error occurred during ${operation} operation for ${this.modelName}:`,
+    );
+    this.serviceLogger.error(err);
+    throw new BadRequestException(
+      `${operation} failed for ${this.modelName}: ${err.message}`,
+    );
   }
 }

@@ -9,7 +9,7 @@ import { appConfig } from '../app.config';
 const algorithm = 'aes-256-cbc';
 
 const encryptionIV = createHash('sha512')
-  .update(appConfig.pwSecret)
+  .update(appConfig.pwSecret || 'default_pw_secret')
   .digest('hex')
   .substring(0, 16);
 

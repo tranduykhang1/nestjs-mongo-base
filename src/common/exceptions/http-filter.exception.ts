@@ -58,7 +58,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const errRes = appConfig.env === 'dev' ? devErrResp : prodErrResp;
 
-    this.logger.log(
+    this.logger.error(
       `request method: ${request.method} request url${request.url}`,
       devErrResp,
     );

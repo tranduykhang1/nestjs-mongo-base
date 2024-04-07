@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -8,7 +8,6 @@ import { appConfig } from './app.config';
 import { HttpExceptionFilter } from './common/exceptions/http-filter.exception';
 import { AspectLogger } from './common/interceptors/log.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { AppLoggerMiddleware } from './common/middleware/logging.middleware';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './modules/auth/guards/role.guard';
@@ -45,10 +44,6 @@ import { UsersModule } from './modules/users/users.module';
   ],
 })
 export class AppModule {
-  configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(AppLoggerMiddleware).forRoutes('*');
-  }
-
   constructor() {
     console.log({ appConfig });
 

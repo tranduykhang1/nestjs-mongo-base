@@ -1,13 +1,19 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { WinstonModule } from 'nest-winston';
 import { appConfig } from './app.config';
 import { AppModule } from './app.module';
-import { ApiDocProtected } from './utils/swagger.auth';
+import logger from './common/logger/winston.logger';
 import { AppClusterConfig } from './utils/app-cluster-config';
+import { ApiDocProtected } from './utils/swagger.auth';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger({
+      instance: logger,
+    }),
+  });
   const httpAdapter = app.getHttpAdapter();
 
   app.setGlobalPrefix(`api`);

@@ -1,4 +1,4 @@
-image: node:16-slim
+image: node:21-alpine
 
 services:
   - docker:dind

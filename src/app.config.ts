@@ -1,9 +1,9 @@
 const devEnv = {
   env: process.env.NODE_ENV,
-  name: process.env.APP_NAME,
-  version: process.env.APP_VERSION,
+  name: process.env.APP_NAME || 'missed',
+  version: process.env.APP_VERSION || 'missed',
   apiVersion: process.env.API_VERSION,
-  mongoURI: process.env.MONGO_URI,
+  mongoURI: process.env.MONGO_URI || 'missed',
   jwtExpiresIn: process.env.AT_EXPIRE,
   jwtSecret: process.env.JWT_SECRET,
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
@@ -23,7 +23,7 @@ const devEnv = {
 
 const testEnv = {
   env: process.env.NODE_ENV,
-  name: 'example',
+  name: 'Change_me',
   version: '1.0.0',
   apiVersion: '1',
   mongoURI: '',
