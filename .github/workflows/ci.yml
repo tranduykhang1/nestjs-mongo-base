@@ -4,12 +4,6 @@ on:
   push:
     branches:
       - "*"
-
-env:
-  DOCKER_HUB_USERNAME: ${{secrets.DOCKER_HUB_US}}
-  DOCKER_HUB_TOKEN: ${{secrets.DOCKER_HUB_AT}}
-  # DEPLOY_KEY: ${{}}
-
 jobs:
   install:
     runs-on: ubuntu-latest
@@ -46,19 +40,19 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{env.DOCKER_HUB_USERNAME}}
-          password: ${{env.DOCKER_HUB_TOKEN}}
+          username: ${{secrets.DOCKER_HUB_US}}
+          password: ${{secrets.DOCKER_HUB_AT}}
 
       - name: Build docker image
-        run: docker build -t ${{env.DOCKER_HUB_USERNAME}}/base-nest:latest
+        run: docker build -t ${{secrets.DOCKER_HUB_US}}/base-nest:latest
 
       - name: Push docker image
-        run: docker push ${{env.DOCKER_HUB_USERNAME}}/base-nest:latest
+        run: docker push ${{secrets.DOCKER_HUB_US}}/base-nest:latest
 
       - name: Update image metadata
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKER_HUB_USERNAME }}/base-nest:latest
+          images: ${{ secrets.DOCKER_HUB_US }}/base-nest:latest
           tags: |
             type=sha
           labels: |
