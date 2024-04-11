@@ -28,8 +28,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run tests
-        run: npm run test
+      - name: Install dependencies and tests
+        run: |
+          npm install 
+          npm run test
 
   build:
     runs-on: ubuntu-latest
