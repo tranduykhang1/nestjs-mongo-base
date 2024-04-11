@@ -44,15 +44,15 @@ jobs:
           password: ${{secrets.DOCKER_HUB_AT}}
 
       - name: Build docker image
-        run: docker build -t ${{secrets.DOCKER_HUB_US}}/base-nest:latest
+        run: docker build -t ${{secrets.DOCKER_HUB_US}}/demo-github-action:latest
 
       - name: Push docker image
-        run: docker push ${{secrets.DOCKER_HUB_US}}/base-nest:latest
+        run: docker push ${{secrets.DOCKER_HUB_US}}/demo-github-action:latest
 
       - name: Update image metadata
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKER_HUB_US }}/base-nest:latest
+          images: ${{ secrets.DOCKER_HUB_US }}/demo-github-action:latest
           tags: |
             type=sha
           labels: |
