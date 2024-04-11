@@ -41,4 +41,4 @@ async function bootstrap() {
   await app.listen(3000);
 }
 
-appConfig.env === 'dev' ? bootstrap() : AppClusterConfig.enabled(bootstrap);
+appConfig.nodeEnv === 'dev' ? bootstrap() : AppClusterConfig.enabled(bootstrap);

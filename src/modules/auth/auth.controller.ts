@@ -1,45 +1,45 @@
 import { Controller, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { SwgCreatedResponse } from 'src/shared/swagger-config/response.swg';
-import { UsersService } from '../users/users.service';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { SwgSuccessResponse } from 'src/shared/swagger-config/response.swg';
 import { AuthService } from './auth.service';
 
 import { Body, Get, Query } from '@nestjs/common';
+import { appConfig } from 'src/app.config';
 import { LoginDto } from './dto/login-dto';
 import { RegisterDto } from './dto/register-dto';
+import { LoginResponse } from './dto/token-payload-dto';
 import { Public } from './utils';
 
 @ApiTags('AUTH')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UsersService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @ApiCreatedResponse({
-    type: SwgCreatedResponse<null>,
+  @ApiOkResponse({
+    type: SwgSuccessResponse<LoginResponse>,
   })
   @Post('/login')
+  @Public()
   async login(@Body() loginDto: LoginDto) {
+    console.log(appConfig);
     return await this.authService.login(loginDto);
   }
 
   @ApiCreatedResponse({
-    type: SwgCreatedResponse<null>,
+    type: SwgSuccessResponse<null>,
   })
   @Post('/register')
+  @Public()
   async register(@Body() registerDto: RegisterDto) {
-    // return await this.userService.register(registerDto); // Assuming you have a register method in your UsersService
+    return await this.authService.register(registerDto);
   }
 
   @ApiCreatedResponse({
-    type: SwgCreatedResponse<{ at: string; rt: string }>, // Assuming this is the structure of the response from refresh token endpoint
+    type: SwgSuccessResponse<{ at: string; rt: string }>,
   })
   @Public()
   @Get('/refresh-token')
   async refreshToken(@Query('refreshToken') refreshToken: string) {
-    return;
-    // return await this.authService.refreshToken(refreshToken);
+    return refreshToken;
   }
 }

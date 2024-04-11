@@ -2,7 +2,7 @@ version: '3'
 
 services:
   api:
-    container_name: example_api
+    container_name: CHANGE_ME_api
     build: .
     command: npm run start:dev
     restart: always
@@ -14,7 +14,7 @@ services:
       - ./.env
 
   db:
-    container_name: example_db
+    container_name: CHANGE_ME_db
     image: mongo
     restart: always
     environment:
@@ -25,7 +25,7 @@ services:
       - db:/data/db
 
   admin:
-    container_name: example_db_admin
+    container_name: CHANGE_ME_db_admin
     image: mongo-express
     restart: always
     ports:
@@ -38,7 +38,7 @@ services:
       - db
 
   files:
-    container_name: example_db_file
+    container_name: CHANGE_ME_db_file
     image: nginx:alpine
     restart: always
     volumes:
@@ -47,14 +47,14 @@ services:
       - $FILE_PORT:80
 
   redis:
-    container_name: example_redis
+    container_name: CHANGE_ME_redis
     image: redis
     restart: always
     volumes:
       - redis:/data/cache
 
   redis-gui:
-    container_name: example_redis_gui
+    container_name: CHANGE_ME_redis_gui
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     restart: always

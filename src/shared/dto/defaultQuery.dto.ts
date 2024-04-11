@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, Min } from 'class-validator';
-import { ESortField, ESortOrder } from '../enum/sort.enum';
+import { ESortField, ESortOrder } from '../enums/sort.enum';
 
-export class DefaultListDto {
+export class DefaultQueryDto {
   @ApiProperty({
     required: false,
     description: 'Number of items limited',

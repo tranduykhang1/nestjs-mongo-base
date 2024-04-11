@@ -1,17 +1,22 @@
 import { TestBed } from '@automock/jest';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/modules/users/users.service';
+import { UserRole } from 'src/shared/enums/user.enum';
+import { Password } from 'src/utils/password';
 import { AuthService } from '../auth.service';
-import { ITokenPayload } from '../models/token-payload.model';
 import { LoginDto } from '../dto/login-dto';
+import { TokenPayload } from '../interfaces/tokenPayload.interface';
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let jwtService: jest.Mocked<JwtService>;
+  let jwtService: jest.Mocked<JwtService>,
+    userService: jest.Mocked<UsersService>;
 
   beforeAll(() => {
     const { unit, unitRef } = TestBed.create(AuthService).compile();
     authService = unit;
     jwtService = unitRef.get(JwtService);
+    userService = unitRef.get(UsersService);
   });
 
   it('should be defined', () => {
@@ -20,7 +25,10 @@ describe('AuthService', () => {
 
   describe('signToken', () => {
     it('should return a token response with access and refresh tokens', () => {
-      const payload = { uid: '1', iss: 'test', nam: 'testUser', rol: 'USER' };
+      const payload: TokenPayload = {
+        uid: '1',
+        rol: UserRole.USER,
+      };
       jwtService.sign.mockReturnValue(`signed-token-for-${payload.uid}`);
 
       const tokens = authService.signToken(payload);
@@ -36,15 +44,20 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('should return a base response with token data', async () => {
-      const input: LoginDto = { loginId: 'test', password: 'test' }; // Replace with actual LoginDto structure
-      const payload: ITokenPayload = {
+      const input: LoginDto = {
+        email: 'johndoe@example.com',
+        password: 'test',
+      };
+      const payload: TokenPayload = {
         uid: '0',
-        iss: 'example',
-        nam: 'example',
-        rol: 'ADMIN',
+        rol: UserRole.USER,
       };
 
       jwtService.sign.mockReturnValue(`signed-token-for-${payload.uid}`);
+      userService.findOne.mockResolvedValueOnce({
+        email: 'return@gmail.com',
+      } as any);
+      jest.spyOn(Password, 'compare').mockReturnValueOnce(true);
 
       const result: any = await authService.login(input);
 

@@ -20,7 +20,7 @@ export class AspectLogger implements NestInterceptor {
 
     const start = new Date().getTime();
 
-    const isDev = appConfig.env === 'dev';
+    const isDev = appConfig.nodeEnv === 'dev';
 
     return next.handle().pipe(
       tap(() => {

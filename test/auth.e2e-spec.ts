@@ -1,19 +1,22 @@
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
+import { RegisterDto } from 'src/modules/auth/dto/register-dto';
+import { LoginResponse } from 'src/modules/auth/dto/token-payload-dto';
+import { ErrorCode } from 'src/shared/errors/constants.error';
 import * as request from 'supertest';
 import { testEnv } from './env.test';
 
 describe('AuthController (e2e)', () => {
   const authUrl = `${testEnv.baseUrl}/api/v1/auth`;
 
-  let _accessToken;
-  let _refreshToken;
-  const mockUser: any = {
-    displayName: faker.name.fullName(),
-    loginId: faker.name.firstName().toLowerCase(),
-    password: 'password',
+  let at, rt;
+
+  const mockUser: RegisterDto = {
+    firstName: faker.person.fullName(),
+    lastName: faker.person.fullName(),
+    email: faker.internet.email(),
+    password: 'pw123123',
   };
-  console.log(authUrl);
 
   describe('/auth/register (POST)', () => {
     it('it should register a user', () => {
@@ -23,6 +26,17 @@ describe('AuthController (e2e)', () => {
         .send(mockUser)
         .expect(HttpStatus.CREATED);
     });
+
+    it('it should throw the duplicate error', async () => {
+      try {
+        await request(authUrl)
+          .post('/register')
+          .set('Accept', 'application/json')
+          .send(mockUser);
+      } catch (err) {
+        expect(err.errorCode).toEqual(ErrorCode.EMAIL_EXISTED);
+      }
+    });
   });
 
   describe('/auth/login (POST)', () => {
@@ -31,64 +45,32 @@ describe('AuthController (e2e)', () => {
         .post('/login')
         .set('Accept', 'application/json')
         .send({
-          loginId: mockUser.loginId,
+          email: mockUser.email,
           password: mockUser.password,
         })
         .expect((response: request.Response) => {
-          const { accessToken, refreshToken } = response.body.data;
-          _accessToken = accessToken;
-          _refreshToken = refreshToken;
+          const data = response.body.data as LoginResponse;
 
-          expect(accessToken).toBeTruthy();
-          expect(refreshToken).toBeTruthy();
+          at = data.at;
+          rt = data.rt;
+
+          expect(at).toBeTruthy();
+          expect(rt).toBeTruthy();
         });
     });
-  });
 
-  describe('/auth/login (POST)', () => {
-    it('it should throw error when missing loginId', () => {
+    it('it should throw error when wrong credentials', async () => {
       try {
-        return request(authUrl)
+        await request(authUrl)
           .post('/login')
           .set('Accept', 'application/json')
           .send({
+            email: 'wrong@email.com',
             password: mockUser.password,
           });
       } catch (err) {
-        console.log(err);
-        expect(err.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+        expect(err.errorCode).toEqual(ErrorCode.WRONG_CREDENTIALS);
       }
-    });
-  });
-
-  describe('/auth/refresh-token (POST)', () => {
-    it('it should create new access and refresh token', () => {
-      return request(authUrl)
-        .post('/refresh-token')
-        .set('Accept', 'application/json')
-        .send({
-          token: _refreshToken,
-        })
-        .expect((response: request.Response) => {
-          const { accessToken, refreshToken } = response.body.data;
-
-          expect(accessToken).toBeTruthy();
-          expect(refreshToken).toBeTruthy();
-        });
-    });
-  });
-
-  describe('/auth/me (GET)', () => {
-    it('it should return the new object user', () => {
-      return request(authUrl)
-        .get('/me')
-        .set('Accept', 'application/json')
-        .set('Authorization', 'Bearer ' + _accessToken)
-        .expect((response: request.Response) => {
-          const { displayName } = response.body.data;
-
-          expect(displayName).toEqual(mockUser.displayName);
-        });
     });
   });
 });

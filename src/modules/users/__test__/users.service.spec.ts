@@ -15,6 +15,7 @@ describe('UsersService', () => {
 
   it('should be defined', () => {
     expect(usersService).toBeDefined();
+    expect(userModel).toBeDefined();
   });
 
   // Add your tests here

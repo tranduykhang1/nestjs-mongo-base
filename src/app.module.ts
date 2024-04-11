@@ -3,9 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
-import { SoftDelete } from 'soft-delete-mongoose-plugin';
 import { appConfig } from './app.config';
-import { HttpExceptionFilter } from './common/exceptions/http-filter.exception';
+import { GlobalHttpException } from './common/exceptions/globalHttp.exception';
 import { AspectLogger } from './common/interceptors/log.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AuthModule } from './modules/auth/auth.module';
@@ -27,7 +26,7 @@ import { UsersModule } from './modules/users/users.module';
     },
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: GlobalHttpException,
     },
     {
       provide: APP_INTERCEPTOR,
@@ -52,12 +51,5 @@ export class AppModule {
       length: 12,
       alphabets: '1234567890',
     });
-
-    mongoose.plugin(
-      new SoftDelete({
-        isDeletedField: 'isDeleted',
-        deletedAtField: 'deletedAt',
-      }).getPlugin(),
-    );
   }
 }
