@@ -24,10 +24,7 @@ export abstract class BaseService<T extends BaseEntity> {
     }
   }
 
-  async create(
-    input: Partial<Record<keyof T, unknown>>,
-    createdBy = '',
-  ): Promise<T> {
+  async create(input: FilterQuery<T>, createdBy = ''): Promise<T> {
     try {
       const createInput = { ...input, createdBy };
       const createdData = await this.model.create(createInput);

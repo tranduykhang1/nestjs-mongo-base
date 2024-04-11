@@ -29,7 +29,7 @@ async function bootstrap() {
     .setTitle(appConfig.name)
     .setVersion(appConfig.version)
     .addBearerAuth()
-    .setContact('Cris', '', 'tdkhang@drimaes.com')
+    .setContact('John Doe', '', 'johndoe@gmail.com')
     .build();
 
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });

@@ -26,7 +26,8 @@ services:
 
   admin:
     container_name: CHANGE_ME_db_admin
-    image: mongo-express
+    image: mongo-express:1.0.0-18-alpine3.18
+
     restart: always
     ports:
       - $ADMIN_PORT:8081
