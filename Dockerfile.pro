@@ -1,16 +1,28 @@
 FROM node:21-alpine AS build
 
-RUN mkdir /home/app && chown node:node /home/app
-WORKDIR /home/app
+RUN mkdir -p /home/app && chown -R node:node /home/app
 
-COPY --chown=node:node package.json package-lock.json* ./
+WORKDIR /home/app
 
 USER node
 
-RUN npm ci --only=production
+COPY --chown=node:node package.json package-lock.json* ./
 
-COPY --chown=node:node --from=build /usr/src/app/dist ./dist
+RUN npm install
 
 COPY --chown=node:node . .
+
+RUN npm run build
+
+FROM node:21-alpine AS production
+
+RUN mkdir -p /home/app && chown -R node:node /home/app
+
+WORKDIR /home/app
+
+USER node
+
+COPY --from=build --chown=node:node /home/app/dist ./dist
+COPY --from=build --chown=node:node /home/app/node_modules ./node_modules
 
 CMD ["node", "dist/main"]
