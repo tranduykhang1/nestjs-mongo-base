@@ -44,7 +44,7 @@ jobs:
           password: ${{secrets.DOCKER_HUB_AT}}
 
       - name: Build docker image
-        run: docker build -t ${{secrets.DOCKER_HUB_US}}/demo-github-action:latest
+        run: docker build -t ${{secrets.DOCKER_HUB_US}}/demo-github-action:latest .
 
       - name: Push docker image
         run: docker push ${{secrets.DOCKER_HUB_US}}/demo-github-action:latest
