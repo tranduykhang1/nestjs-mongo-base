@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { Request, Response } from 'express';
-import { appConfig } from 'src/app.config';
+import { appConfig } from '../../app.config';
 
 type ErrorResponse = {
   errorCode: string | number;

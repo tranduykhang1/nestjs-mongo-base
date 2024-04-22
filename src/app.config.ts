@@ -1,10 +1,10 @@
 const devEnv = {
   nodeEnv: process.env.NODE_ENV,
-  name: process.env.APP_NAME || 'missed',
-  version: process.env.APP_VERSION || 'missed',
+  name: process.env.APP_NAME!,
+  version: process.env.APP_VERSION!,
   apiVersion: process.env.API_VERSION,
   apiPort: process.env.API_PORT,
-  mongoURI: process.env.MONGO_URI || 'missed',
+  mongoURI: process.env.MONGO_URI!,
   jwtExpiresIn: process.env.AT_EXPIRE,
   jwtSecret: process.env.JWT_SECRET,
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
@@ -20,6 +20,9 @@ const devEnv = {
   maxWorkers: process.env.MAX_WORKERS,
   throttleTTL: process.env.THROTTLE_TTL,
   throttleLimit: process.env.THROTTLE_LIMIT,
+  redisPass: process.env.REDIS_PASSWORD!,
+  redisHost: process.env.REDIS_HOST!,
+  redisPort: process.env.REDIS_PORT!,
 } as const;
 
 export const testEnv = {
@@ -41,6 +44,9 @@ export const testEnv = {
   maxWorkers: '1',
   throttleTTL: process.env.THROTTLE_TTL,
   throttleLimit: process.env.THROTTLE_LIMIT,
+  redisPass: 'redis-secret',
+  redisHost: 'host',
+  redisPort: 3000,
 } as const;
 
 export const appConfig =
