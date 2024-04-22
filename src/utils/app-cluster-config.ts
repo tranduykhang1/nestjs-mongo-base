@@ -7,9 +7,9 @@ const numCPUs = os.cpus().length;
 @Injectable()
 export class AppClusterConfig {
   static enabled(callback: any): void {
-    const maxWorker = appConfig.maxWorkers;
+    const maxWorker = appConfig.maxWorkers || 2;
     let workers: any = maxWorker;
-    if (numCPUs < parseInt(maxWorker)) {
+    if (numCPUs < +maxWorker) {
       workers = numCPUs;
     }
     if (cluster?.isPrimary) {

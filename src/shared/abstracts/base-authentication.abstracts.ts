@@ -1,5 +1,5 @@
-import { TokenResponse } from 'src/modules/auth/dto/token-payload-dto';
+import { LoginResponse } from 'src/modules/auth/dto/token-payload-dto';
 
 export abstract class BaseAuthentication {
-  abstract authenticate(token: string): Promise<TokenResponse>;
+  abstract authenticate(token: string): Promise<LoginResponse>;
 }

@@ -5,16 +5,16 @@ import {
   PickType,
 } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
-import { EUserGender } from 'src/shared/enum/user.enum';
+import { UserGender } from 'src/shared/enums/user.enum';
 import { CreateUserDto } from './create-user-dto';
 
 export class UpdateUserDto extends PartialType(
   PickType(CreateUserDto, ['displayName', 'password']),
 ) {
-  @ApiProperty({ enum: EUserGender })
+  @ApiProperty({ enum: UserGender })
   @IsOptional()
-  @IsEnum(EUserGender)
-  gender: EUserGender;
+  @IsEnum(UserGender)
+  gender: UserGender;
 
   @ApiHideProperty()
   key: string;

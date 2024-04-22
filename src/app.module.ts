@@ -1,25 +1,29 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
-import { SoftDelete } from 'soft-delete-mongoose-plugin';
 import { appConfig } from './app.config';
-import { HttpExceptionFilter } from './common/exceptions/http-filter.exception';
+import { GlobalHttpException } from './common/exceptions/globalHttp.exception';
 import { AspectLogger } from './common/interceptors/log.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { AppLoggerMiddleware } from './common/middleware/logging.middleware';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './modules/auth/guards/role.guard';
+import { HeathModule } from './modules/heath/heath.module';
+import { RedisModule } from './modules/redis/redis.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: [`.env`],
+    }),
     MongooseModule.forRoot(appConfig.mongoURI),
     AuthModule,
     UsersModule,
+    RedisModule,
+    HeathModule,
   ],
   providers: [
     {
@@ -28,7 +32,7 @@ import { UsersModule } from './modules/users/users.module';
     },
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: GlobalHttpException,
     },
     {
       provide: APP_INTERCEPTOR,
@@ -45,10 +49,6 @@ import { UsersModule } from './modules/users/users.module';
   ],
 })
 export class AppModule {
-  configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(AppLoggerMiddleware).forRoutes('*');
-  }
-
   constructor() {
     console.log({ appConfig });
 
@@ -57,12 +57,5 @@ export class AppModule {
       length: 12,
       alphabets: '1234567890',
     });
-
-    mongoose.plugin(
-      new SoftDelete({
-        isDeletedField: 'isDeleted',
-        deletedAtField: 'deletedAt',
-      }).getPlugin(),
-    );
   }
 }

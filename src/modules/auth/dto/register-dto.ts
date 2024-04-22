@@ -5,10 +5,17 @@ import { LoginDto } from './login-dto';
 export class RegisterDto extends LoginDto {
   @IsString()
   @ApiProperty({
-    description: 'New user displayName',
-    example: 'User name',
+    description: 'First name',
+    example: 'John',
   })
-  displayName: string;
+  firstName: string;
+
+  @IsString()
+  @ApiProperty({
+    description: 'Last name',
+    example: 'Doe',
+  })
+  lastName: string;
 
   @ApiHideProperty()
   key?: string;

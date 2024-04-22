@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
-import { DefaultListDto } from '../../../shared/dto/default-list-dto';
-import { EUserRole } from '../../../shared/enum/user.enum';
+import { DefaultQueryDto } from 'src/shared/dto/defaultQuery.dto';
+import { UserRole } from 'src/shared/enums/user.enum';
 
-export class GetUserDto extends DefaultListDto {
-  @IsEnum(EUserRole)
+export class GetUserDto extends DefaultQueryDto {
+  @IsEnum(UserRole)
   @IsOptional()
-  @ApiProperty({ enum: EUserRole, required: false })
-  role?: EUserRole;
+  @ApiProperty({ enum: UserRole, required: false })
+  role?: UserRole;
 }

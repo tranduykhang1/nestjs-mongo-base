@@ -1,6 +1,4 @@
-FROM node:16 AS development
-
-ENV TZ="Asia/Seoul"
+FROM node:21-alpine AS development
 
 RUN mkdir /home/app && chown node:node /home/app
 WORKDIR /home/app

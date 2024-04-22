@@ -1,11 +1,13 @@
 import {
-    CallHandler,
-    ExecutionContext,
-    Injectable,
-    NestInterceptor,
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
 } from '@nestjs/common';
+import { HttpStatusCode } from 'axios';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { MessageResponse } from 'src/shared/responses/message.response';
 
 export interface Response<T> {
   statusCode: number;
@@ -13,19 +15,23 @@ export interface Response<T> {
   data: T;
 }
 
+const messageMapper = {
+  [HttpStatusCode.Created]: MessageResponse.created,
+  [HttpStatusCode.Ok]: MessageResponse.succeed,
+};
+
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const status = context.switchToHttp().getResponse().statusCode;
     return next.handle().pipe(
       map((data) => ({
-        statusCode:
-          data?.statusCode || context.switchToHttp().getResponse().statusCode,
-        message: data?.message || 'Success',
+        status,
+        message: data?.message || messageMapper[status],
+        data: data?.data || data || {},
         filter: data?.filter,
         total: data?.total,
-        data: data?.data || {},
       })),
     );
   }
 }
-

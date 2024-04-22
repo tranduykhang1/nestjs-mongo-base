@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 export class BaseResponse<T = unknown, F = unknown> {
-  statusCode?: HttpStatus;
+  status?: HttpStatus;
 
   message?: string;
 

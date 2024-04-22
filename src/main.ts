@@ -1,13 +1,19 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { WinstonModule } from 'nest-winston';
 import { appConfig } from './app.config';
 import { AppModule } from './app.module';
-import { ApiDocProtected } from './utils/swagger.auth';
+import logger from './common/logger/winston.logger';
 import { AppClusterConfig } from './utils/app-cluster-config';
+import { ApiDocProtected } from './utils/swagger.auth';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger({
+      instance: logger,
+    }),
+  });
   const httpAdapter = app.getHttpAdapter();
 
   app.setGlobalPrefix(`api`);
@@ -23,7 +29,7 @@ async function bootstrap() {
     .setTitle(appConfig.name)
     .setVersion(appConfig.version)
     .addBearerAuth()
-    .setContact('Cris', '', 'tdkhang@drimaes.com')
+    .setContact('John Doe', '', 'johndoe@gmail.com')
     .build();
 
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
@@ -35,4 +41,4 @@ async function bootstrap() {
   await app.listen(3000);
 }
 
-appConfig.env === 'dev' ? bootstrap() : AppClusterConfig.enabled(bootstrap);
+appConfig.nodeEnv === 'dev' ? bootstrap() : AppClusterConfig.enabled(bootstrap);

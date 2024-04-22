@@ -1,13 +1,28 @@
-FROM node:16 AS production
+FROM node:21-alpine AS build
 
-ENV TZ="Asia/Seoul"
+RUN mkdir -p /home/app && chown -R node:node /home/app
 
-RUN mkdir /home/app && chown node:node /home/app
 WORKDIR /home/app
 
 USER node
+
 COPY --chown=node:node package.json package-lock.json* ./
 
 RUN npm install
 
 COPY --chown=node:node . .
+
+RUN npm run build
+
+FROM node:21-alpine AS production
+
+RUN mkdir -p /home/app && chown -R node:node /home/app
+
+WORKDIR /home/app
+
+USER node
+
+COPY --from=build --chown=node:node /home/app/dist ./dist
+COPY --from=build --chown=node:node /home/app/node_modules ./node_modules
+
+CMD ["node", "dist/main"]

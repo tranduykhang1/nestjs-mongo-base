@@ -1,27 +1,46 @@
 import {
   CallHandler,
   ExecutionContext,
+  HttpStatus,
   Injectable,
   Logger,
   NestInterceptor,
 } from '@nestjs/common';
 import { tap } from 'rxjs';
+import { appConfig } from 'src/app.config';
 
 @Injectable()
 export class AspectLogger implements NestInterceptor {
+  logger = new Logger(AspectLogger.name);
   intercept(context: ExecutionContext, next: CallHandler) {
-    const logger: Logger = new Logger('AppLogger');
     const req = context.switchToHttp().getRequest();
-    const { originalUrl, method, params, query, body } = req;
+    const res = context.switchToHttp().getResponse();
+    const { ip, originalUrl: url, method, params, query, body } = req;
+    const statusCode: HttpStatus = res?.statusCode;
 
-    logger.log({
-      originalUrl,
-      method,
-      params,
-      query,
-      body,
-    });
+    const start = new Date().getTime();
 
-    return next.handle().pipe(tap((data) => logger.log(data)));
+    const isDev = appConfig.nodeEnv === 'dev';
+
+    return next.handle().pipe(
+      tap(() => {
+        const duration = new Date().getTime() - start;
+
+        isDev
+          ? this.logger.verbose(
+              `${ip} - ${method} - ${url} - ${statusCode} - ${duration}ms`,
+            )
+          : this.logger.verbose({
+              ip,
+              method,
+              url,
+              statusCode,
+              duration,
+              params,
+              query,
+              body,
+            });
+      }),
+    );
   }
 }

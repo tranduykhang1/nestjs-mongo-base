@@ -1,22 +1,43 @@
 import { Controller, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { UsersService } from '../../modules/users/users.service';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { SwgCreatedResponse } from 'src/shared/swagger-config/success-response.swg';
+
+import { Body, Get, Query } from '@nestjs/common';
+import { SwgSuccessResponse } from 'src/shared/swagger-config/response.swg';
+import { LoginDto } from './dto/login-dto';
+import { RegisterDto } from './dto/register-dto';
+import { LoginResponse } from './dto/token-payload-dto';
+import { Public } from './utils';
 
 @ApiTags('AUTH')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UsersService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @ApiCreatedResponse({
-    type: SwgCreatedResponse<null>,
+  @ApiOkResponse({
+    type: SwgSuccessResponse<LoginResponse>,
   })
   @Post('/login')
-  create() {
-    return;
+  @Public()
+  async login(@Body() loginDto: LoginDto) {
+    return await this.authService.login(loginDto);
+  }
+
+  @ApiCreatedResponse({
+    type: SwgSuccessResponse<null>,
+  })
+  @Post('/register')
+  @Public()
+  async register(@Body() registerDto: RegisterDto) {
+    return await this.authService.register(registerDto);
+  }
+
+  @ApiCreatedResponse({
+    type: SwgSuccessResponse<{ at: string; rt: string }>,
+  })
+  @Public()
+  @Get('/refresh-token')
+  async refreshToken(@Query('refreshToken') refreshToken: string) {
+    return refreshToken;
   }
 }

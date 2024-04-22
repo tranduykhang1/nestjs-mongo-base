@@ -1,9 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument } from 'mongoose';
-import { EUserGender, EUserRole } from '../../../shared/enum/user.enum';
-import { ELoginMethod, EUserStatus } from '../users.enum';
-import { BaseEntity } from 'src/shared/entity/base-object.entity';
+import { BaseEntity } from 'src/shared/entities/base-object.entity';
+import { UserRole } from 'src/shared/enums/user.enum';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -11,7 +10,11 @@ export type UserDocument = HydratedDocument<User>;
 export class User extends BaseEntity {
   @Prop({ minlength: 3, maxlength: 30 })
   @ApiProperty()
-  displayName: string;
+  firstName: string;
+
+  @Prop({ minlength: 3, maxlength: 30 })
+  @ApiProperty()
+  lastName: string;
 
   @Prop({ unique: true })
   @ApiProperty()
@@ -25,33 +28,13 @@ export class User extends BaseEntity {
   @ApiProperty()
   password: string;
 
-  @Prop({ default: EUserRole.ADMIN })
-  @ApiProperty()
-  role: EUserRole;
-
-  @Prop({ default: '' })
-  @ApiProperty()
-  avatar?: string;
+  @Prop({ enum: UserRole })
+  @ApiProperty({ enum: UserRole })
+  role: UserRole;
 
   @Prop({ default: null })
-  @ApiProperty()
-  birthDay?: Date;
-
-  @Prop({ default: EUserGender.N_A })
-  @ApiProperty()
-  gender?: string;
-
-  @Prop({ default: EUserStatus.ACTIVE })
-  @ApiProperty()
-  status?: EUserStatus;
-
-  @Prop({ default: '' })
-  @ApiProperty()
-  providerId?: string;
-
-  @Prop({ default: ELoginMethod.LOCAL })
-  @ApiProperty()
-  loginMethod?: string;
+  @ApiProperty({ example: new Date() })
+  lastLogin: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
