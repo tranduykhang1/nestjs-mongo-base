@@ -10,14 +10,20 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './modules/auth/guards/role.guard';
+import { HeathModule } from './modules/heath/heath.module';
+import { RedisModule } from './modules/redis/redis.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: [`.env`],
+    }),
     MongooseModule.forRoot(appConfig.mongoURI),
     AuthModule,
     UsersModule,
+    RedisModule,
+    HeathModule,
   ],
   providers: [
     {

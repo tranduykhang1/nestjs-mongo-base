@@ -3,5 +3,10 @@
     "Cris",
     "maxlength",
     "nestjs"
-  ]
+  ],
+  "docwriter.style": "JSDoc",
+  "docwriter.progress.trackFunctions": true,
+  "docwriter.progress.trackMethods": true,
+  "docwriter.progress.trackClasses": false,
+  "docwriter.progress.trackTypes": true
 }

@@ -1,10 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
-import { RegisterDto } from 'src/modules/auth/dto/register-dto';
-import { LoginResponse } from 'src/modules/auth/dto/token-payload-dto';
-import { ErrorCode } from 'src/shared/errors/constants.error';
 import * as request from 'supertest';
+import { RegisterDto } from '../src/modules/auth/dto/register-dto';
+import { LoginResponse } from '../src/modules/auth/dto/token-payload-dto';
+import { ErrorCode } from '../src/shared/errors/constants.error';
 import { testEnv } from './env.test';
+import { dbCollections } from './utils/db-collections';
+import { TestDbUtils } from './utils/db.utils';
 
 describe('AuthController (e2e)', () => {
   const authUrl = `${testEnv.baseUrl}/api/v1/auth`;
@@ -18,8 +20,15 @@ describe('AuthController (e2e)', () => {
     password: 'pw123123',
   };
 
+  afterAll(async () => {
+    await new TestDbUtils().cleanup(
+      { email: mockUser.email },
+      dbCollections.user,
+    );
+  });
+
   describe('/auth/register (POST)', () => {
-    it('it should register a user', () => {
+    it('it should register a user', async () => {
       return request(authUrl)
         .post('/register')
         .set('Accept', 'application/json')
@@ -34,6 +43,7 @@ describe('AuthController (e2e)', () => {
           .set('Accept', 'application/json')
           .send(mockUser);
       } catch (err) {
+        console.log(err);
         expect(err.errorCode).toEqual(ErrorCode.EMAIL_EXISTED);
       }
     });

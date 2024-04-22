@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { BaseError } from 'src/shared/errors/base.error';
 import { ErrorCode } from 'src/shared/errors/constants.error';
 import { BaseResponse } from 'src/shared/responses/base.response';
-import { MessageResponse } from 'src/shared/responses/message.response';
 import { Password } from 'src/utils/password';
 import { User } from '../users/entity/user.entity';
 import { UsersService } from '../users/users.service';
@@ -66,7 +65,6 @@ export class AuthService {
     try {
       const { email, password } = input;
       let user = await this.usersService.findOne({ email });
-      console.log(user);
       if (user) {
         throw new BaseError({
           errorCode: ErrorCode.EMAIL_EXISTED,
@@ -82,7 +80,7 @@ export class AuthService {
       });
 
       return {
-        message: MessageResponse.created,
+        message: 'Verification link has been sent',
         data: user,
       };
     } catch (err) {

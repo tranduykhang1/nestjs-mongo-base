@@ -21,13 +21,14 @@ services:
       - MONGO_INITDB_ROOT_USERNAME
       - MONGO_INITDB_ROOT_PASSWORD
       - MONGO_INITDB_DATABASE
+    ports:
+      - 27019:27017
     volumes:
       - db:/data/db
 
   admin:
     container_name: CHANGE_ME_db_admin
     image: mongo-express:1.0.0-18-alpine3.18
-
     restart: always
     ports:
       - $ADMIN_PORT:8081
@@ -51,6 +52,7 @@ services:
     container_name: CHANGE_ME_redis
     image: redis
     restart: always
+    command: bash -c "redis-server --appendonly yes --requirepass $REDIS_PASSWORD"
     volumes:
       - redis:/data/cache
 
@@ -59,8 +61,13 @@ services:
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     restart: always
+    depends_on:
+      - redis
     environment:
-      - REDIS_HOSTS=local:redis:6379
+      - REDIS_HOST
+      - REDIS_PASSWORD
+      - HTTP_USER=admin
+      - HTTP_PASSWORD=admin 
     ports:
       - $REDIS_PORT_GUI:8081
 

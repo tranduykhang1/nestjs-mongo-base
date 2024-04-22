@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthRoles } from '../auth/decorators/auth-role.decorator';
 import { UsersService } from './users.service';
-import { UserRole } from 'src/shared/enums/user.enum';
+import { UserRole } from '../../shared/enums/user.enum';
 
 @ApiTags('USER')
 @ApiBearerAuth()
