@@ -7,7 +7,7 @@ on:
       - "*/*"
 
 jobs:
-  install:
+  test:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout the code
@@ -24,18 +24,6 @@ jobs:
         run: |
           npm ci
           npm run build
-
-  test:
-    runs-on: ubuntu-22.04
-    needs: [install]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Install dependencies and tests
-        run: |
           npm run test
 
   build:
