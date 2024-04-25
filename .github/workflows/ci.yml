@@ -6,19 +6,16 @@ on:
       - "*"
       - "*/*"
 
-env:
-  UBUNTU_VERSION: ubuntu-22.04
-
 jobs:
   test:
-    runs-on: ${{env.UBUNTU_VERSION}}
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      - name: Setup Node.js with caching
+      - name: Setup Node version
         uses: actions/setup-node@v4
         with:
           node-version: "21.x"
@@ -30,7 +27,7 @@ jobs:
           npm run test
 
   build:
-    runs-on: ${{env.UBUNTU_VERSION}}
+    runs-on: ubuntu-22.04
     needs: [test]
     steps:
       - name: Checkout code
