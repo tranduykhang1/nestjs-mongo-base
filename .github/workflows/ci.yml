@@ -11,7 +11,7 @@ env:
 
 jobs:
   test:
-    runs-on: $UBUNTU_VERSION
+    runs-on: ${{env.UBUNTU_VERSION}}
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
           npm run test
 
   build:
-    runs-on: $UBUNTU_VERSION
+    runs-on: ${{env.UBUNTU_VERSION}}
     needs: [test]
     steps:
       - name: Checkout code
