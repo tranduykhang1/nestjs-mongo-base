@@ -6,9 +6,12 @@ on:
       - "*"
       - "*/*"
 
+env:
+  UBUNTU_VERSION: ubuntu-22.04
+
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: $UBUNTU_VERSION
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
@@ -20,14 +23,14 @@ jobs:
         with:
           node-version: "21.x"
 
-      - name: Install dependencies and build
+      - name: Install - Build - Test
         run: |
           npm ci
           npm run build
           npm run test
 
   build:
-    runs-on: ubuntu-22.04
+    runs-on: $UBUNTU_VERSION
     needs: [test]
     steps:
       - name: Checkout code
