@@ -27,6 +27,9 @@ jobs:
           npm run test
 
   build:
+    if: |
+      github.ref == 'refs/heads/staging' ||
+      github.ref == 'refs/heads/main'
     runs-on: ubuntu-22.04
     needs: [test]
     steps:
