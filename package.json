@@ -20,8 +20,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "NODE_ENV=e2e-test jest --config  ./tests/jest-e2e.json",
-    "seed": "docker compose exec api node dist/seed",
-    "seed:refresh": "docker compose exec api node dist/seed --refresh",
+    "seed": "docker compose exec api node dist/src/seed",
+    "seed:refresh": "docker compose exec api node dist/src/seed --refresh",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -38,6 +38,7 @@
     "@nestjs/platform-express": "^10.3.7",
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/terminus": "^10.2.3",
+    "@nestjs/throttler": "^5.1.2",
     "axios": "^1.6.8",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -45,6 +46,7 @@
     "console-log-colors": "^0.4.0",
     "googleapis": "^134.0.0",
     "ioredis": "^5.4.1",
+    "mongodb-memory-server": "^9.2.0",
     "mongoose": "^8.3.0",
     "mongoose-nanoid": "^2.1.5",
     "nest-winston": "^1.9.4",

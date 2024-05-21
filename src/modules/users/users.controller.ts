@@ -1,13 +1,23 @@
-import { Controller } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthRoles } from '../auth/decorators/auth-role.decorator';
+import { Controller, Get } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { TokenPayload } from 'google-auth-library';
+import { SwgSuccessResponse } from 'src/shared/swagger-config/response.swg';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from './entity/user.entity';
 import { UsersService } from './users.service';
-import { UserRole } from '../../shared/enums/user.enum';
 
 @ApiTags('USER')
 @ApiBearerAuth()
 @Controller('users')
-@AuthRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
+
+  @ApiOkResponse({
+    type: SwgSuccessResponse<User>,
+  })
+  @Get('/me')
+  async getMe(@CurrentUser() user: TokenPayload) {
+    console.log(user);
+    return;
+  }
 }

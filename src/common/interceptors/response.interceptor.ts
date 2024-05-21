@@ -17,7 +17,7 @@ export interface Response<T> {
 
 const messageMapper = {
   [HttpStatusCode.Created]: MessageResponse.created,
-  [HttpStatusCode.Ok]: MessageResponse.succeed,
+  [HttpStatusCode.Ok]: MessageResponse.success,
 };
 
 @Injectable()

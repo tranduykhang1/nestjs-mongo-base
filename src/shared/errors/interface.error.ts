@@ -1,8 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
-import { ErrorCode } from './constants.error';
 
 export interface CustomError {
-  errorCode: ErrorCode;
+  errorCode: number;
   message?: string;
   statusCode?: HttpStatus;
 }

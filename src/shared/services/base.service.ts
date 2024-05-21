@@ -5,7 +5,7 @@ import { Nullable } from 'src/common/types/types';
 import { BaseEntity } from '../entities/base-object.entity';
 import { ESortField, ESortOrder } from '../enums/sort.enum';
 import { BaseError } from '../errors/base.error';
-import { ErrorCode } from '../errors/constants.error';
+import { Errors } from '../errors/constants.error';
 
 export abstract class BaseService<T extends BaseEntity> {
   private readonly modelName: string;
@@ -53,6 +53,27 @@ export abstract class BaseService<T extends BaseEntity> {
         .populate(populates)) as unknown as T;
 
       return result ?? null;
+    } catch (err) {
+      throw this.handleServiceError(err, `FindOne ${this.modelName}`);
+    }
+  }
+
+  async fineOneWithError(
+    filter: FilterQuery<T>,
+    populates: { path: string; select?: string }[] = [],
+    isDeleted = false,
+  ): Promise<T> {
+    try {
+      const queryFilter: FilterQuery<T> = { ...filter, isDeleted };
+      if (isDeleted) {
+        delete queryFilter.isDeleted;
+      }
+      const result = (await this.model
+        .findOne(queryFilter)
+        .populate(populates)) as unknown as T;
+
+      if (!result) throw new BaseError(Errors.COMMON_NOT_FOUND_ERROR);
+      return result;
     } catch (err) {
       throw this.handleServiceError(err, `FindOne ${this.modelName}`);
     }
@@ -185,9 +206,6 @@ export abstract class BaseService<T extends BaseEntity> {
       `Error occurred during ${operation} operation for ${this.modelName}:`,
     );
     this.serviceLogger.error(err);
-    throw new BaseError({
-      errorCode: ErrorCode.COMMON_ERROR,
-      message: `${operation} failed for ${this.modelName}: ${err.message}`,
-    });
+    throw new BaseError(Errors.COMMON_ERROR);
   }
 }

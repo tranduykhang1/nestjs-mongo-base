@@ -3,24 +3,34 @@ DB_NAME = CHANGE_ME_db
 REDIS_NAME = CHANGE_ME_redis
 
 
-docker-up:
+db-backup:
+	@echo "Not implemented..."
+db-restore:
+	@echo "Not implemented..."
+
+up:
 	docker compose up -d
 
-docker-build:
+build:
 	docker compose up -d --build
 
-docker-api-logs:
+api-logs:
 	docker logs -f ${API_NAME}  --tail 10000
 
-docker-api-exec:
+api-exec:
 	docker exec -it ${API_NAME} sh
 
-docker-down:
+api-restart:
+	docker restart ${API_NAME}
+
+down:
 	docker compose down
 
-docker-down-clear:
+down-clear:
 	docker compose down -v
 
+mongo-init:
+	sh ./mongo-setup/setup.sh
 
 unit-test:
 	npm run test

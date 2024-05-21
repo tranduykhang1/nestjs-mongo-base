@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ErrorCode } from '../errors/constants.error';
 
 export class SwgQueryResponse<T = unknown, F = unknown> {
   @ApiProperty({ example: 'success' })
@@ -24,8 +23,8 @@ export class SwgSuccessResponse<T> {
 }
 
 export class SwgErrorUnAuthResponse {
-  @ApiProperty({ enum: ErrorCode })
-  errorCode: ErrorCode;
+  @ApiProperty({})
+  errorCode: 400;
 
   @ApiProperty({ type: String })
   message: string;

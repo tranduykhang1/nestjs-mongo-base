@@ -14,7 +14,6 @@ mongoose.plugin(require('mongoose-nanoid'), {
 seeder({
   imports: [
     MongooseModule.forRoot(appConfig.mongoURI),
-
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
 }).run(seeders);

@@ -1,9 +1,11 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { REDIS_KEY, REDIS_TTL } from 'src/shared/enums/redis.enum';
 import { BaseError } from 'src/shared/errors/base.error';
-import { ErrorCode } from 'src/shared/errors/constants.error';
+import { Errors } from 'src/shared/errors/constants.error';
 import { BaseResponse } from 'src/shared/responses/base.response';
 import { Password } from 'src/utils/password';
+import { RedisService } from '../redis/redis.service';
 import { User } from '../users/entity/user.entity';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login-dto';
@@ -16,6 +18,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
+    private readonly redisServices: RedisService,
   ) {}
 
   signToken(payload: TokenPayload): LoginResponse {
@@ -32,32 +35,33 @@ export class AuthService {
     try {
       const user = await this.usersService.findOne({ email });
       if (user) {
-        if (!Password.compare(user.password, user.key, password)) {
-          throw new BaseError({
-            statusCode: HttpStatus.UNAUTHORIZED,
-            errorCode: ErrorCode.WRONG_CREDENTIALS,
-          });
+        if (!Password.compare(password, user.key, user.password)) {
+          throw new BaseError(Errors.WRONG_CREDENTIALS);
         }
 
         const payload: TokenPayload = {
           uid: user._id,
           rol: user.role,
+          ema: user.email,
         };
-        await this.usersService.update({ email }, { lastLogin: new Date() });
+
+        const data = this.signToken(payload);
+        await Promise.all([
+          this.usersService.update({ email }, { lastLogin: new Date() }),
+          this.redisServices.set(
+            `${REDIS_KEY.AUTH_LOGIN}${user._id}`,
+            data,
+            REDIS_TTL.AUTH_LOGIN,
+          ),
+        ]);
 
         return {
-          data: this.signToken(payload),
+          data,
         };
       }
-      throw new BaseError({
-        statusCode: HttpStatus.UNAUTHORIZED,
-        errorCode: ErrorCode.WRONG_CREDENTIALS,
-      });
+      throw new BaseError(Errors.WRONG_CREDENTIALS);
     } catch (err) {
-      throw new BaseError({
-        errorCode: ErrorCode.LOGIN_FAILED,
-        message: err?.message,
-      });
+      throw err;
     }
   }
 
@@ -66,10 +70,7 @@ export class AuthService {
       const { email, password } = input;
       let user = await this.usersService.findOne({ email });
       if (user) {
-        throw new BaseError({
-          errorCode: ErrorCode.EMAIL_EXISTED,
-          statusCode: HttpStatus.CONFLICT,
-        });
+        throw new BaseError(Errors.DUPLICATE_EMAIL);
       }
       const { encryptedData, key } = Password.encrypt(password);
 
@@ -84,10 +85,19 @@ export class AuthService {
         data: user,
       };
     } catch (err) {
-      throw new BaseError({
-        errorCode: ErrorCode.LOGIN_FAILED,
-        message: err?.message,
-      });
+      throw err;
     }
+  }
+
+  async refreshToken(userId: string): Promise<BaseResponse<LoginResponse>> {
+    const user = await this.usersService.fineOneWithError({ _id: userId });
+    const payload: TokenPayload = {
+      uid: user._id,
+      rol: user.role,
+      ema: user.email,
+    };
+    return {
+      data: this.signToken(payload),
+    };
   }
 }

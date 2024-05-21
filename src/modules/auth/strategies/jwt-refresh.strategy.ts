@@ -8,26 +8,35 @@ import { BaseError } from 'src/shared/errors/base.error';
 import { Errors } from 'src/shared/errors/constants.error';
 import { appConfig } from '../../../app.config';
 import { LoginResponse } from '../dto/token-payload-dto';
-import { TokenPayload } from '../interfaces/tokenPayload.interface';
+import {
+  RefreshTokenPayload,
+  TokenPayload,
+} from '../interfaces/tokenPayload.interface';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh-token',
+) {
   constructor(private redisService: RedisService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromBodyField('token'),
       ignoreExpiration: false,
       secretOrKey: appConfig.jwtSecret,
       passReqToCallback: true,
     });
   }
 
-  async validate(req: Request, payload: TokenPayload): Promise<TokenPayload> {
+  async validate(
+    req: Request,
+    payload: TokenPayload,
+  ): Promise<RefreshTokenPayload> {
     try {
-      const token = req.headers.authorization?.split(' ')[1];
+      const token = req.body?.token;
 
       if (!token) {
         throw new BaseError({
-          ...Errors.UNAUTHORIZED,
+          ...Errors.MISSED_TOKEN,
           statusCode: HttpStatus.UNAUTHORIZED,
         });
       }
@@ -38,7 +47,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       );
 
       if (decoded) {
-        if (token !== decoded.at) {
+        if (token !== decoded.rt) {
           throw new BaseError({
             ...Errors.SESSION_EXPIRED,
             statusCode: HttpStatus.UNAUTHORIZED,
@@ -46,7 +55,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         }
         return {
           uid: payload.uid,
-          rol: payload.rol,
         };
       }
       throw new BaseError({

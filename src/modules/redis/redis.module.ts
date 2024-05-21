@@ -8,7 +8,6 @@ import { RedisService } from './redis.service';
   imports: [
     IORedisModule.forRoot({
       type: 'single',
-      // url: `redis://default:${appConfig.redisPass}@${appConfig.redisHost}:${appConfig.redisPort}`,
       options: {
         host: appConfig.redisHost,
         port: +appConfig.redisPort,
@@ -20,5 +19,6 @@ import { RedisService } from './redis.service';
   ],
   controllers: [RedisController],
   providers: [RedisService],
+  exports: [RedisService],
 })
 export class RedisModule {}

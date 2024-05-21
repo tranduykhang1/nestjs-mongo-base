@@ -1,5 +1,5 @@
 export enum MessageResponse {
   created = 'Created!',
-  succeed = 'Succeed!',
+  success = 'Success!',
   deleted = 'Deleted!',
 }

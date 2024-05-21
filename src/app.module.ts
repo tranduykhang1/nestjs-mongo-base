@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ThrottlerModule } from '@nestjs/throttler';
 import mongoose from 'mongoose';
 import { appConfig } from './app.config';
 import { GlobalHttpException } from './common/exceptions/globalHttp.exception';
@@ -20,6 +21,12 @@ import { UsersModule } from './modules/users/users.module';
       envFilePath: [`.env`],
     }),
     MongooseModule.forRoot(appConfig.mongoURI),
+    ThrottlerModule.forRoot([
+      {
+        ttl: appConfig.throttleTTL,
+        limit: appConfig.throttleLimit,
+      },
+    ]),
     AuthModule,
     UsersModule,
     RedisModule,
@@ -54,7 +61,7 @@ export class AppModule {
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     mongoose.plugin(require('mongoose-nanoid'), {
-      length: 12,
+      length: 21,
       alphabets: '1234567890',
     });
   }
