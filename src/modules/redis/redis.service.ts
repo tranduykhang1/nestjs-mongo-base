@@ -22,4 +22,8 @@ export class RedisService {
     }
     return JSON.parse(result);
   }
+
+  async close(): Promise<void> {
+    await this.client.quit();
+  }
 }

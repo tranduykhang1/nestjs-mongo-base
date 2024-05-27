@@ -22,6 +22,7 @@ type EnvConfig = {
   redisPass: string;
   redisHost: string;
   redisPort: string | number;
+  redisDB: number | string;
 };
 
 const devEnv: EnvConfig = {
@@ -48,6 +49,7 @@ const devEnv: EnvConfig = {
   redisPass: process.env.REDIS_PASSWORD || 'defaultRedisPass',
   redisHost: process.env.REDIS_HOST || 'localhost',
   redisPort: process.env.REDIS_PORT || 6379,
+  redisDB: process.env.REDIS_DB || 0,
 };
 
 const testEnv: EnvConfig = {
@@ -72,9 +74,10 @@ const testEnv: EnvConfig = {
   maxWorkers: '1',
   throttleTTL: 10,
   throttleLimit: 20,
-  redisPass: 'testRedisPass',
+  redisPass: 'redis-secret',
   redisHost: 'localhost',
-  redisPort: 6379,
+  redisPort: 6380,
+  redisDB: 1,
 };
 
 export const appConfig: EnvConfig =

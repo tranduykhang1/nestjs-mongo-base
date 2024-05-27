@@ -13,7 +13,7 @@ import { RedisService } from './redis.service';
         port: +appConfig.redisPort,
         username: 'default',
         password: appConfig.redisPass,
-        db: 0,
+        db: +appConfig.redisDB,
       },
     }),
   ],
