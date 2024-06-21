@@ -7,7 +7,7 @@ import { Nullable } from 'src/common/types/types';
 export class RedisService {
   constructor(@InjectRedis() private client: Redis) {}
 
-  async set<T>(key: string, value: T, ttl?: number): Promise<void> {
+  async set<T>(key: string, value: T, ttl = -1): Promise<void> {
     if (ttl) {
       await this.client.set(key, JSON.stringify(value), 'EX', ttl);
     } else {

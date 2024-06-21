@@ -7,7 +7,7 @@ import { seeders } from './seeder';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 mongoose.plugin(require('mongoose-nanoid'), {
-  length: 12,
+  length: 24,
   alphabets: '1234567890',
 });
 

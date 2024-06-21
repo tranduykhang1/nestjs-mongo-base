@@ -28,7 +28,7 @@ export class User extends BaseEntity {
   @ApiProperty()
   password: string;
 
-  @Prop({ enum: UserRole })
+  @Prop({ enum: UserRole, default: UserRole.USER })
   @ApiProperty({ enum: UserRole, default: UserRole.USER })
   role: UserRole;
 

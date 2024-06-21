@@ -11,7 +11,7 @@ import { Request, Response } from 'express';
 import { appConfig } from '../../app.config';
 
 type ErrorResponse = {
-  errorCode: string | number;
+  errorCode: number;
   message: string;
   timestamp: Date;
   path: string;
@@ -22,8 +22,9 @@ type ErrorResponse = {
 export class GlobalHttpException implements ExceptionFilter {
   private readonly logger = new Logger(GlobalHttpException.name);
 
-  private errorMessages = {
+  private readonly errorMessages = {
     'Bad Request': 'Have an error. Please try again!',
+    'Internal Server Error': 'Have an error. Please try again!',
   };
 
   catch(exception: HttpException, host: ArgumentsHost) {
@@ -36,14 +37,13 @@ export class GlobalHttpException implements ExceptionFilter {
     >;
 
     const status: HttpStatus =
-      exceptionResponse.statusCode || HttpStatus.BAD_REQUEST;
-    const errorCode = exceptionResponse?.errorCode || status;
+      exceptionResponse.statusCode ?? HttpStatus.BAD_REQUEST;
+    const errorCode = exceptionResponse?.errorCode ?? status;
 
-    let message =
-      exceptionResponse?.message ||
-      response.statusMessage ||
-      'Have an error. Please try again!';
-    message = this.errorMessages[message] || message;
+    const message =
+      this.errorMessages[
+        exceptionResponse?.message ?? response.statusMessage
+      ] ?? this.errorMessages['Bad Request'];
 
     const errorResponse: ErrorResponse = {
       errorCode,
@@ -54,15 +54,43 @@ export class GlobalHttpException implements ExceptionFilter {
     };
 
     if (appConfig.nodeEnv === 'dev') {
-      this.logger.error(
-        `Request Method: ${request.method} Request URL: ${request.url}`,
-        exception.stack,
+      this.handleDevEnvironment(
+        request,
+        exception,
+        errorResponse,
+        response,
+        status,
       );
-
-      response.status(status).json(errorResponse);
       return;
     }
 
+    this.handleProdEnvironment(errorResponse, response, status);
+  }
+
+  private handleDevEnvironment(
+    request: Request,
+    exception: HttpException,
+    errorResponse: ErrorResponse,
+    response: Response,
+    status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+  ) {
+    this.logger.error(
+      `Request Method: ${request.method} Request URL: ${request.url}`,
+      exception.stack,
+    );
+
     response.status(status).json(errorResponse);
+  }
+
+  private handleProdEnvironment(
+    errorResponse: ErrorResponse,
+    response: Response,
+    status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+  ) {
+    response.status(status).json({
+      errorCode: errorResponse.errorCode,
+      message: errorResponse.message,
+      path: errorResponse.path,
+    });
   }
 }

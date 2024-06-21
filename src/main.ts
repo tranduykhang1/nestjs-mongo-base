@@ -32,7 +32,10 @@ async function bootstrap() {
     .setContact('John Doe', '', 'johndoe@gmail.com')
     .build();
 
-  app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: appConfig.apiVersion,
+  });
 
   const document = SwaggerModule.createDocument(app, config);
 

@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { TokenPayload } from 'google-auth-library';
 import { SwgSuccessResponse } from 'src/shared/swagger-config/response.swg';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { TokenPayload } from '../auth/interfaces/tokenPayload.interface';
 import { User } from './entity/user.entity';
 import { UsersService } from './users.service';
 
@@ -16,8 +16,7 @@ export class UsersController {
     type: SwgSuccessResponse<User>,
   })
   @Get('/me')
-  async getMe(@CurrentUser() user: TokenPayload) {
-    console.log(user);
-    return;
+  async getMe(@CurrentUser() { uid }: TokenPayload) {
+    return this.userService.findOne({ _id: uid });
   }
 }

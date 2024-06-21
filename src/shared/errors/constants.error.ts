@@ -1,3 +1,5 @@
+import { HttpStatus } from '@nestjs/common';
+
 export const Errors = {
   // COMMON
   COMMON_ERROR: {
@@ -7,6 +9,11 @@ export const Errors = {
   COMMON_NOT_FOUND_ERROR: {
     errorCode: 12001,
     message: 'Resource not found!',
+  },
+  TOO_MANY_REQUEST: {
+    errorCode: 12002,
+    message: 'Too many request!',
+    statusCode: HttpStatus.TOO_MANY_REQUESTS,
   },
 
   // AUTH
@@ -27,10 +34,12 @@ export const Errors = {
   DUPLICATE_EMAIL: {
     errorCode: 10004,
     message: 'duplicate email!',
+    statusCode: HttpStatus.CONFLICT,
   },
   UNAUTHORIZED: {
     errorCode: 10005,
     message: 'unauthorized!',
+    statusCode: HttpStatus.UNAUTHORIZED,
   },
   SESSION_EXPIRED: {
     errorCode: 10006,

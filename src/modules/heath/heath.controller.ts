@@ -10,9 +10,11 @@ import {
   MongooseHealthIndicator,
 } from '@nestjs/terminus';
 import { Connection } from 'mongoose';
+import { Public } from '../auth/utils';
 
 @ApiTags('HEATH')
 @Controller('health')
+@Public()
 export class HealthController {
   constructor(
     private healthCheckService: HealthCheckService,
