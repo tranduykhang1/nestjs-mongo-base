@@ -1,10 +1,10 @@
-export enum UserRole {
+export enum USER_ROLE {
   ADMIN = 'ADMIN',
   SUPER_ADMIN = 'SUPER_ADMIN',
   USER = 'USER',
 }
 
-export enum UserGender {
+export enum USER_GENDER {
   MALE = 'MALE',
   FEMALE = 'FEMALE',
   OTHER = 'OTHER',

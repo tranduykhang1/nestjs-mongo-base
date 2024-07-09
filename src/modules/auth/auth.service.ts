@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { appConfig } from 'src/app.config';
 import { REDIS_KEY, REDIS_TTL } from 'src/shared/enums/redis.enum';
 import { BaseError } from 'src/shared/errors/base.error';
 import { Errors } from 'src/shared/errors/constants.error';
 import { BaseResponse } from 'src/shared/responses/base.response';
 import { Password } from 'src/utils/password';
+import { MailQueueProducer } from '../bull-queue/mail-queue/mail-queue.producer';
 import { RedisService } from '../redis/redis.service';
 import { User } from '../users/entity/user.entity';
 import { UsersService } from '../users/users.service';
@@ -19,6 +21,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
     private readonly redisServices: RedisService,
+    private readonly mailQueueProducer: MailQueueProducer,
   ) {}
 
   signToken(payload: TokenPayload): LoginResponse {
@@ -80,6 +83,9 @@ export class AuthService {
         key,
       });
 
+      const verificationKey = await this.signVerificationToken();
+      this.mailQueueProducer.sendRegistration(email, verificationKey);
+
       return {
         message: 'Verification link has been sent',
         data: user,
@@ -99,5 +105,10 @@ export class AuthService {
     return {
       data: this.signToken(payload),
     };
+  }
+
+  signVerificationToken(): string {
+    const { key } = Password.encrypt(appConfig.jwtRefreshSecret);
+    return key;
   }
 }

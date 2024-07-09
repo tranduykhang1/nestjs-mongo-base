@@ -1,7 +1,8 @@
 import { TestBed } from '@automock/jest';
 import { JwtService } from '@nestjs/jwt';
+import { MailQueueProducer } from 'src/modules/bull-queue/mail-queue/mail-queue.producer';
 import { UsersService } from 'src/modules/users/users.service';
-import { UserRole } from 'src/shared/enums/user.enum';
+import { USER_ROLE } from 'src/shared/enums/user.enum';
 import { BaseError } from 'src/shared/errors/base.error';
 import { Errors } from 'src/shared/errors/constants.error';
 import { Password } from 'src/utils/password';
@@ -11,15 +12,17 @@ import { RegisterDto } from '../dto/register-dto';
 import { TokenPayload } from '../interfaces/tokenPayload.interface';
 
 describe('AuthService', () => {
-  let authService: AuthService;
-  let jwtService: jest.Mocked<JwtService>,
-    userService: jest.Mocked<UsersService>;
+  let authService: AuthService,
+    jwtService: jest.Mocked<JwtService>,
+    userService: jest.Mocked<UsersService>,
+    mailQueueProducer: jest.Mocked<MailQueueProducer>;
 
   beforeAll(() => {
     const { unit, unitRef } = TestBed.create(AuthService).compile();
     authService = unit;
     jwtService = unitRef.get(JwtService);
     userService = unitRef.get(UsersService);
+    mailQueueProducer = unitRef.get(MailQueueProducer);
   });
 
   it('should be defined', () => {
@@ -30,7 +33,7 @@ describe('AuthService', () => {
     it('should return a token response with access and refresh tokens', () => {
       const payload: TokenPayload = {
         uid: '1',
-        rol: UserRole.USER,
+        rol: USER_ROLE.USER,
       };
       jwtService.sign.mockReturnValue(`signed-token-for-${payload.uid}`);
 
@@ -53,7 +56,7 @@ describe('AuthService', () => {
       };
       const payload: TokenPayload = {
         uid: '0',
-        rol: UserRole.USER,
+        rol: USER_ROLE.USER,
       };
 
       jwtService.sign.mockReturnValue(`signed-token-for-${payload.uid}`);
@@ -78,7 +81,7 @@ describe('AuthService', () => {
       };
       const payload: TokenPayload = {
         uid: '0',
-        rol: UserRole.USER,
+        rol: USER_ROLE.USER,
       };
 
       jwtService.sign.mockReturnValue(`signed-token-for-${payload.uid}`);
@@ -131,6 +134,7 @@ describe('AuthService', () => {
         password: encryptedPassword,
         key: encryptionKey,
       } as any);
+      jest.spyOn(mailQueueProducer, 'sendRegistration').mockReturnValueOnce();
 
       const result = await authService.register(input);
 

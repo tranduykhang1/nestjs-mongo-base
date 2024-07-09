@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { Seeder } from 'nestjs-seeder';
 import { User } from '../modules/users/entity/user.entity';
 import { Password } from '../utils/password';
-import { UserRole } from 'src/shared/enums/user.enum';
+import { USER_ROLE } from 'src/shared/enums/user.enum';
 
 @Injectable()
 export class UserSeeder implements Seeder {
@@ -26,7 +26,7 @@ export class UserSeeder implements Seeder {
         email: `user${i}@user.com`,
         password: hashData.encryptedData,
         key: hashData.key,
-        role: UserRole.USER,
+        role: USER_ROLE.USER,
       });
     }
 

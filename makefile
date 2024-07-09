@@ -1,9 +1,7 @@
 .PHONY: help db-backup db-restore up build api-logs api-exec api-restart down down-clear mongo-init unit e2e seed
+include .env
 
 API_NAME = CHANGE_ME_api
-DB_NAME = CHANGE_ME_db
-REDIS_NAME = CHANGE_ME_redis
-
 
 GREEN := \033[0;32m
 NC := \033[0m 
@@ -25,11 +23,17 @@ help:
 	@echo "$(GREEN)  seed        $(NC)- Seed the database"
 
 
-
 db-backup:
-	@echo "Not implemented..."
+	sh ./mongo-setup/backup.sh
+	@echo "$(GREEN)==============================="
+	@echo "$(GREEN)Database Backup Successully!!"
+	@echo "$(GREEN)==============================="
+
 db-restore:
-	@echo "Not implemented..."
+	sh ./mongo-setup/restore.sh
+	@echo "$(GREEN)==============================="
+	@echo "$(GREEN)Database Restore Successully!!"
+	@echo "$(GREEN)==============================="
 
 up:
 	docker compose up -d

@@ -7,7 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { UserRole } from 'src/shared/enums/user.enum';
+import { USER_ROLE } from 'src/shared/enums/user.enum';
 
 export class CreateUserDto {
   @MinLength(3)
@@ -24,9 +24,9 @@ export class CreateUserDto {
   @ApiProperty()
   password: string;
 
-  @IsEnum(UserRole)
+  @IsEnum(USER_ROLE)
   @ApiProperty()
-  role: UserRole;
+  role: USER_ROLE;
 
   @IsOptional()
   @ApiProperty()

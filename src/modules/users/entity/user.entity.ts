@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument } from 'mongoose';
 import { BaseEntity } from 'src/shared/entities/base-object.entity';
-import { UserRole } from 'src/shared/enums/user.enum';
+import { USER_ROLE } from 'src/shared/enums/user.enum';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -28,9 +28,9 @@ export class User extends BaseEntity {
   @ApiProperty()
   password: string;
 
-  @Prop({ enum: UserRole, default: UserRole.USER })
-  @ApiProperty({ enum: UserRole, default: UserRole.USER })
-  role: UserRole;
+  @Prop({ enum: USER_ROLE, default: USER_ROLE.USER })
+  @ApiProperty({ enum: USER_ROLE, default: USER_ROLE.USER })
+  role: USER_ROLE;
 
   @Prop({ default: null })
   @ApiProperty({ example: new Date() })

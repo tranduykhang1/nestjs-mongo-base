@@ -14,6 +14,8 @@ import { RolesGuard } from './modules/auth/guards/role.guard';
 import { HeathModule } from './modules/heath/heath.module';
 import { RedisModule } from './modules/redis/redis.module';
 import { UsersModule } from './modules/users/users.module';
+import { BullQueueModule } from './modules/bull-queue/bull-queue.module';
+import { MailingModule } from './modules/mailing/mailing.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { UsersModule } from './modules/users/users.module';
     UsersModule,
     RedisModule,
     HeathModule,
+    BullQueueModule,
+    MailingModule,
   ],
   providers: [
     {

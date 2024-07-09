@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, Min } from 'class-validator';
-import { ESortField, ESortOrder } from '../enums/sort.enum';
+import { SORT_FIELD, SORT_ORDER } from '../enums/sort.enum';
 
 export class DefaultQueryDto {
   @ApiProperty({
@@ -43,20 +43,20 @@ export class DefaultQueryDto {
   @ApiProperty({
     required: false,
     description: 'The name of sort field sorted',
-    enum: ESortField,
+    enum: SORT_FIELD,
     example: 'createdAt',
   })
-  @IsEnum(ESortField)
+  @IsEnum(SORT_FIELD)
   @IsOptional()
-  sortField?: ESortField;
+  sortField?: SORT_FIELD;
 
   @ApiProperty({
     required: false,
     description: 'Sort newest or oldest',
-    enum: ESortOrder,
+    enum: SORT_ORDER,
     example: 'asc',
   })
-  @IsEnum(ESortOrder)
+  @IsEnum(SORT_ORDER)
   @IsOptional()
-  sortOrder?: ESortOrder;
+  sortOrder?: SORT_ORDER;
 }

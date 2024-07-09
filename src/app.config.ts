@@ -23,6 +23,8 @@ type EnvConfig = {
   redisHost: string;
   redisPort: string | number;
   redisDB: number | string;
+  supportEmailPw: string;
+  supportEmail: string;
 };
 
 const devEnv: EnvConfig = {
@@ -50,6 +52,8 @@ const devEnv: EnvConfig = {
   redisHost: process.env.REDIS_HOST || 'localhost',
   redisPort: process.env.REDIS_PORT || 6379,
   redisDB: process.env.REDIS_DB || 0,
+  supportEmailPw: process.env.SUPPORT_EMAIL_PW!,
+  supportEmail: process.env.SUPPORT_EMAIL!,
 };
 
 const testEnv: EnvConfig = {
@@ -78,6 +82,8 @@ const testEnv: EnvConfig = {
   redisHost: 'localhost',
   redisPort: 6380,
   redisDB: 1,
+  supportEmailPw: 'pw',
+  supportEmail: 'email@email.com',
 };
 
 export const appConfig: EnvConfig =

@@ -3,7 +3,7 @@ import { FilterQuery, Model, PipelineStage } from 'mongoose';
 import { appConfig } from 'src/app.config';
 import { Nullable } from 'src/common/types/types';
 import { BaseEntity } from '../entities/base-object.entity';
-import { ESortField, ESortOrder } from '../enums/sort.enum';
+import { SORT_FIELD, SORT_ORDER } from '../enums/sort.enum';
 import { BaseError } from '../errors/base.error';
 import { Errors } from '../errors/constants.error';
 
@@ -171,17 +171,17 @@ export abstract class BaseService<T extends BaseEntity> {
   async findAndCount<M = T>(
     filter: FilterQuery<T>,
     paginate: {
-      sortField: ESortField;
-      sortOrder: ESortOrder;
+      sortField: SORT_FIELD;
+      sortOrder: SORT_ORDER;
       offset: number;
       limit: number;
     },
     pipes: any[],
-    secondSortField?: ESortField,
+    secondSortField?: SORT_FIELD,
   ): Promise<{ items: M[]; total: number }> {
     try {
       const { sortField, sortOrder, offset, limit } = paginate;
-      const sortOrderNumber = sortOrder === ESortOrder.DESC ? -1 : 1;
+      const sortOrderNumber = sortOrder === SORT_ORDER.DESC ? -1 : 1;
       const secondSort = secondSortField || '_id';
 
       const [items, total] = await Promise.all([
