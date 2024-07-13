@@ -1,5 +1,4 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { AuthModule } from 'src/modules/auth/auth.module';
@@ -7,6 +6,7 @@ import { RegisterDto } from 'src/modules/auth/dto/register-dto';
 import { LoginResponse } from 'src/modules/auth/dto/token-payload-dto';
 import { Errors } from 'src/shared/errors/constants.error';
 import * as request from 'supertest';
+import { MongoMemoryTestModule } from './mongo-test.module';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication, mongoServer: MongoMemoryServer;
@@ -22,10 +22,11 @@ describe('AuthController (e2e)', () => {
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
-
     const moduleRef = await Test.createTestingModule({
-      imports: [AuthModule, MongooseModule.forRoot(uri)],
+      imports: [
+        AuthModule,
+        await MongoMemoryTestModule.createMongooseTestModule(),
+      ],
     }).compile();
 
     app = moduleRef.createNestApplication();

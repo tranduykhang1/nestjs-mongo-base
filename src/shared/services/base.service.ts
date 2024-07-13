@@ -1,5 +1,5 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { FilterQuery, Model, PipelineStage } from 'mongoose';
+import { ClientSession, FilterQuery, Model, PipelineStage } from 'mongoose';
 import { appConfig } from 'src/app.config';
 import { Nullable } from 'src/common/types/types';
 import { BaseEntity } from '../entities/base-object.entity';
@@ -198,6 +198,23 @@ export abstract class BaseService<T extends BaseEntity> {
       return { items, total };
     } catch (err) {
       throw this.handleServiceError(err, `Query ${this.modelName}`);
+    }
+  }
+
+  async withTransaction(
+    func: (session: ClientSession) => Promise<T>,
+  ): Promise<T> {
+    const session = await this.model.startSession();
+    session.startTransaction();
+    try {
+      const result = await func(session);
+      await session.commitTransaction();
+      return result;
+    } catch (err) {
+      await session.abortTransaction();
+      throw err;
+    } finally {
+      session.endSession();
     }
   }
 

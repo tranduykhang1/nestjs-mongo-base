@@ -11,13 +11,21 @@ if (!fs.existsSync(dir)) {
 }
 
 const customFormat = format.printf(({ timestamp, level, message, stack }) => {
-  let logMessage = `${timestamp} - [${level.toUpperCase()}] - ${message}`;
+  let logMessage = `${timestamp} - [%c${level.toUpperCase()}%c] - ${message}`;
 
   if (stack) {
     logMessage += `\n${stack}`;
   }
 
-  return logMessage;
+  if (level === 'error') {
+    logMessage = logMessage.replace(/%c/g, '\x1b[31m');
+  } else if (level === 'warn') {
+    logMessage = logMessage.replace(/%c/g, '\x1b[33m');
+  } else {
+    logMessage = logMessage.replace(/%c/g, '\x1b[32m');
+  }
+
+  return logMessage + '\x1b[0m';
 });
 
 const currentDate = new Date();
@@ -48,7 +56,6 @@ const options = {
 const logger = createLogger({
   format: format.combine(
     format.timestamp(),
-    // format.colorize(),
     format.errors({ stack: true }),
     customFormat,
   ),

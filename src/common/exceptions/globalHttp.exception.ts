@@ -75,7 +75,7 @@ export class GlobalHttpException implements ExceptionFilter {
     status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
   ) {
     this.logger.error(
-      `Request Method: ${request.method} Request URL: ${request.url}`,
+      `🐛 Request Error: ${request.method} Request URL: ${request.url}`,
       exception.stack,
     );
 

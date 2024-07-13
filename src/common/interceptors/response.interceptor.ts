@@ -2,6 +2,7 @@ import {
   CallHandler,
   ExecutionContext,
   Injectable,
+  Logger,
   NestInterceptor,
 } from '@nestjs/common';
 import { HttpStatusCode } from 'axios';
@@ -22,16 +23,25 @@ const messageMapper = {
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
+  private readonly logger = new Logger(ResponseInterceptor.name);
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const request = context.switchToHttp().getRequest();
     const status = context.switchToHttp().getResponse().statusCode;
+    this.logger.log(
+      `✨ Request Success: [${request.user?.uid}] - ${request.method} - ${request.url}`,
+    );
+
     return next.handle().pipe(
-      map((data) => ({
-        status,
-        message: data?.message || messageMapper[status],
-        data: data?.data || data || {},
-        filter: data?.filter,
-        total: data?.total,
-      })),
+      map((data) => {
+        return {
+          status,
+          message: data?.message || messageMapper[status],
+          data: data?.data || data || {},
+          filter: data?.filter,
+          total: data?.total,
+        };
+      }),
     );
   }
 }
