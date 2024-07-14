@@ -25,4 +25,6 @@ USER node
 COPY --from=build --chown=node:node /home/app/dist ./dist
 COPY --from=build --chown=node:node /home/app/node_modules ./node_modules
 
+EXPOSE $API_PORT
+
 CMD ["node", "dist/main"]

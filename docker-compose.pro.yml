@@ -12,6 +12,8 @@ services:
       - .:/home/app
     env_file:
       - ./.env
+    networks:
+      - nest_demo_network
 
   db:
     container_name: CHANGE_ME_staging_db
@@ -23,6 +25,8 @@ services:
       - MONGO_INITDB_DATABASE
     volumes:
       - db:/data/db
+    networks:
+      - nest_demo_network
 
   admin:
     container_name: CHANGE_ME_staging_db_admin
@@ -36,6 +40,8 @@ services:
       - ME_CONFIG_MONGODB_URL=$MONGO_URI
     depends_on:
       - db
+    networks:
+      - nest_demo_network
 
   files:
     container_name: CHANGE_ME_staging_db_file
@@ -45,13 +51,38 @@ services:
       - $FILE_ROOT:/usr/share/nginx/html
     ports:
       - $FILE_PORT:80
+    networks:
+      - nest_demo_network
 
   redis:
-    container_name: boo_oong_redis
+    container_name: CHANGE_ME_redis
     image: redis
     restart: always
     volumes:
       - redis:/data/cache
+    networks:
+      - nest_demo_network
+
+  web-server:
+    container_name: CHANGE_ME_server
+    image: nginx:latest
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    expose:
+      - "443"
+      - "80"
+    ports:
+      - "5050:80/tcp"
+      - "5051:443/tcp"
+    networks:
+      - nest_demo_network
+
+
 
 volumes:
   redis:
+
+networks: 
+  nest_demo_network:
+    driver: brigde

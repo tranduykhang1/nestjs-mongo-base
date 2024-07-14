@@ -41,7 +41,7 @@ async function bootstrap() {
 
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(3000);
+  await app.listen(appConfig.apiPort);
 }
 
 appConfig.nodeEnv === 'dev' ? bootstrap() : AppClusterConfig.enabled(bootstrap);

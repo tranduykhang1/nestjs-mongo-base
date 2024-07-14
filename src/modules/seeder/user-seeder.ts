@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import { Model } from 'mongoose';
 import { Seeder } from 'nestjs-seeder';
-import { User } from '../modules/users/entity/user.entity';
-import { Password } from '../utils/password';
 import { USER_ROLE } from 'src/shared/enums/user.enum';
+import { User } from '../users/entity/user.entity';
+import { Password } from 'src/utils/password';
 
 @Injectable()
 export class UserSeeder implements Seeder {
