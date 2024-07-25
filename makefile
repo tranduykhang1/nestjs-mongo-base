@@ -18,8 +18,8 @@ help:
 	@echo "$(GREEN)  down        $(NC)- (Docker)Stop all services"
 	@echo "$(GREEN)  down-clear  $(NC)- (Docker for dev) Stop all services and remove volumes"
 	@echo "$(GREEN)  mongo-init  $(NC)- Initialize MongoDB using the setup script"
-	@echo "$(GREEN)  unit        $(NC)- Run unit tests"
-	@echo "$(GREEN)  e2e         $(NC)- Run end-to-end tests"
+	@echo "$(GREEN)  unit-test   $(NC)- Run unit tests"
+	@echo "$(GREEN)  e2e-test    $(NC)- Run end-to-end tests"
 	@echo "$(GREEN)  seed        $(NC)- Seed the database"
 
 
@@ -59,10 +59,10 @@ down-clear:
 mongo-init:
 	sh ./mongo-setup/setup.sh
 
-unit:
+unit-test:
 	npm run test
 
-e2e:
+e2e-test:
 	npm run test:e2e
 
 seed:

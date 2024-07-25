@@ -16,6 +16,7 @@ import { RedisModule } from './modules/redis/redis.module';
 import { UsersModule } from './modules/users/users.module';
 import { BullQueueModule } from './modules/bull-queue/bull-queue.module';
 import { MailingModule } from './modules/mailing/mailing.module';
+import { FirebaseLibModule } from './modules/firebase-lib/firebase-lib.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { MailingModule } from './modules/mailing/mailing.module';
     HeathModule,
     BullQueueModule,
     MailingModule,
+    FirebaseLibModule,
   ],
   providers: [
     {

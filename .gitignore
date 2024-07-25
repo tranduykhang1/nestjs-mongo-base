@@ -5,6 +5,7 @@
 .env
 /files/*
 !/files/index.html
+auth.json
 
 # Logs
 /logs

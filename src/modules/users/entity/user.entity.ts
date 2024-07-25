@@ -34,7 +34,7 @@ export class User extends BaseEntity {
 
   @Prop({ default: null })
   @ApiProperty({ example: new Date() })
-  lastLogin: Date;
+  lastActivity: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

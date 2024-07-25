@@ -50,7 +50,7 @@ export class AuthService {
 
         const data = this.signToken(payload);
         await Promise.all([
-          this.usersService.update({ email }, { lastLogin: new Date() }),
+          this.usersService.update({ email }, { lastActivity: new Date() }),
           this.redisServices.set(
             `${REDIS_KEY.AUTH_LOGIN}${user._id}`,
             data,
