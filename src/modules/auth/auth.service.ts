@@ -96,7 +96,7 @@ export class AuthService {
   }
 
   async refreshToken(userId: string): Promise<BaseResponse<LoginResponse>> {
-    const user = await this.usersService.fineOneWithError({ _id: userId });
+    const user = await this.usersService.findOneUseStrict({ _id: userId });
     const payload: TokenPayload = {
       uid: user._id,
       rol: user.role,

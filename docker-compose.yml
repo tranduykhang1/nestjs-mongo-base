@@ -7,9 +7,7 @@ services:
     command: npm run start:dev
     restart: always
     ports:
-      - $API_PORT:3000
-    expose:
-      - $API_PORT
+      - $API_PORT:$API_PORT
     volumes:
       - .:/home/app
     depends_on:
@@ -112,21 +110,6 @@ services:
       - $REDIS_PORT_GUI:8081
     expose:
       - $REDIS_PORT_GUI
-    networks:
-      - nest_demo_network
-
-  web-server:
-    container_name: CHANGE_ME_server
-    image: nginx:latest
-    restart: always
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    expose:
-      - "443"
-      - "80"
-    ports:
-      - "5050:80/tcp"
-      - "5051:443/tcp"
     networks:
       - nest_demo_network
 

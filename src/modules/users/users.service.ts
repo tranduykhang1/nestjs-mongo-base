@@ -1,14 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Inject, Injectable } from '@nestjs/common';
 import { BaseService } from '../../shared/services/base.service';
-import { User, UserDocument } from './entity/user.entity';
+import { User } from './entity/user.entity';
+import { UsersRepository } from './user.repository';
 
 @Injectable()
 export class UsersService extends BaseService<User> {
   constructor(
-    @InjectModel(User.name) protected userModel: Model<UserDocument>,
+    @Inject(UsersRepository) private usersRepository: UsersRepository,
   ) {
-    super(userModel);
+    super(usersRepository);
   }
 }

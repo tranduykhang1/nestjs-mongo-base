@@ -1,13 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument } from 'mongoose';
-import { BaseEntity } from 'src/shared/entities/base-object.entity';
+import { BaseDateTrackingEntity } from 'src/shared/entities/baseDateTracking.entity';
 import { USER_ROLE } from 'src/shared/enums/user.enum';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
-export class User extends BaseEntity {
+export class User extends BaseDateTrackingEntity {
   @Prop({ minlength: 3, maxlength: 30 })
   @ApiProperty()
   firstName: string;

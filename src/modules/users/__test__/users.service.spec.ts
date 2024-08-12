@@ -1,21 +1,20 @@
 import { TestBed } from '@automock/jest';
-import { getModelToken } from '@nestjs/mongoose';
-import { User, UserDocument } from '../entity/user.entity';
+import { UsersRepository } from '../user.repository';
 import { UsersService } from '../users.service';
 
 describe('UsersService', () => {
   let usersService: UsersService;
-  let userModel: jest.Mocked<UserDocument>;
+  let usersRepository: jest.Mocked<UsersRepository>;
 
   beforeAll(() => {
     const { unit, unitRef } = TestBed.create(UsersService).compile();
     usersService = unit;
-    userModel = unitRef.get(getModelToken(User.name));
+    usersRepository = unitRef.get(UsersRepository);
   });
 
   it('should be defined', () => {
     expect(usersService).toBeDefined();
-    expect(userModel).toBeDefined();
+    expect(usersRepository).toBeDefined();
   });
 
   // Add your tests here
