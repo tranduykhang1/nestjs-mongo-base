@@ -6,13 +6,12 @@ WORKDIR /home/app
 
 USER node
 
-COPY --chown=node:node package.json package-lock.json* ./
+COPY package.json package-lock.json ./
+RUN npm install --unsafe-perm
 
-RUN npm install
+COPY . .
 
-COPY --chown=node:node . .
-
-RUN npm run build
+RUN npm run build --unsafe-perm
 
 FROM node:21-alpine AS production
 
@@ -28,3 +27,6 @@ COPY --from=build --chown=node:node /home/app/node_modules ./node_modules
 EXPOSE $API_PORT
 
 CMD ["node", "dist/main"]
+
+USER node
+

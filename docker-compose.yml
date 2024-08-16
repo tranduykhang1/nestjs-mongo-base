@@ -11,13 +11,13 @@ services:
     volumes:
       - .:/home/app
     depends_on:
-      - mongo
+      - db
     env_file:
       - ./.env
     networks:
       - nest_demo_network
 
-  mongo:
+  db:
     container_name: CHANG_ME_mongo
     image: mongo
     restart: always
@@ -30,27 +30,27 @@ services:
       - MONGO_HOST_2
     volumes:
       - mongo-data:/data/db
-      - ./mongo-setup/rs-init.sh:/scripts/rs-init.sh
+      # - ./mongo-setup/rs-init.sh:/scripts/rs-init.sh
     ports:
       - $MONGO_PORT:27017
-    entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'rs0']
+    # entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'rs0']
     networks:
       - nest_demo_network
 
-  mongo1:
-    container_name: CHANG_ME_mongo_1
-    image: mongo
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME
-      - MONGO_INITDB_ROOT_PASSWORD
-    depends_on:
-      - mongo
-    ports:
-      - 27031:27017
-    restart: always
-    entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'rs0']
-    networks:
-      - nest_demo_network
+  # db1:
+  #   container_name: CHANG_ME_mongo_1
+  #   image: mongo
+  #   environment:
+  #     - MONGO_INITDB_ROOT_USERNAME
+  #     - MONGO_INITDB_ROOT_PASSWORD
+  #   depends_on:
+  #     - mongo
+  #   ports:
+  #     - 27031:27017
+  #   restart: always
+  #   entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'rs0']
+  #   networks:
+  #     - nest_demo_network
 
   admin:
     container_name: CHANGE_ME_db_admin
@@ -65,7 +65,7 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=$MONGO_INITDB_ROOT_PASSWORD
       - ME_CONFIG_MONGODB_URL=$MONGO_URI
     depends_on:
-      - mongo
+      - db
     networks:
       - nest_demo_network
 
