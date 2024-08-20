@@ -40,6 +40,7 @@ services:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=$MONGO_INITDB_ROOT_USERNAME
       - ME_CONFIG_MONGODB_ADMINPASSWORD=$MONGO_INITDB_ROOT_PASSWORD
       - ME_CONFIG_MONGODB_URL=$MONGO_URI
+      - ME_CONFIG_SITE_BASEURL=/mongo-admin
     depends_on:
       - db
     networks:
@@ -88,3 +89,4 @@ volumes:
 
 networks:
   nest_demo_network:
+    external: true
