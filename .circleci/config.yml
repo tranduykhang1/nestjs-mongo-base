@@ -1,54 +1,74 @@
 version: 2.1
-
 orbs:
   node: circleci/node@5
-
-workflows:
-  build:
-    jobs:
-      - node/test
-      - build:
-          requires:
-            - node/test
-          filters:
-            branches:
-              only:
-                - staging
-                - main
-
 jobs:
-  test:
-    docker:
-      - image: cimg/node:21
+  test-node:
+    executor: node/default
+    environment:
+      JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
       - checkout
+      - node/install-packages:
+          pkg-manager: npm
       - run:
-          name: Install - Build - Test
-          command: |
-            npm ci
-            npm run build
-            npm run test
+          name: Install
+          command: npm ci
+      - run:
+          name: Run build
+          command: npm run build
+      - run:
+          name: Run test
+          command: npm run test
 
-  # build:
-  #   docker:
-  #     - image: cimg/node:21
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Set up Docker Buildx
-  #         command: docker buildx install
-  #     - run:
-  #         name: Login to DockerHub
-  #         command: |
-  #           echo "${DOCKER_HUB_AT}" | docker login -u "${DOCKER_HUB_US}" --password-stdin
-  #     - run:
-  #         name: Build docker image
-  #         command: docker build -t "${DOCKER_HUB_US}/demo-github-action:latest" -f Dockerfile.pro .
-  #     - run:
-  #         name: Push docker image
-  #         command: docker push "${DOCKER_HUB_US}/demo-github-action:latest"
-  #     - run:
-  #         name: Update image metadata
-  #         command: |
-  #           docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workspace jimmidyson/metadata-action:latest --images "${DOCKER_HUB_US}/demo-github-action:latest" --tags type=sha --labels "org.opencontainers.image.title=Base Nest Example,org.opencontainers.image.description=Example NestJS github action application,org.opencontainers.image.url=https://github.com/${CIRCLE_PROJECT_REPONAME},org.opencontainers.image.revision=${CIRCLE_SHA1},org.opencontainers.image.licenses=MIT"
+  build-node:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          command: npm run build
+      - run:
+          name: Create the ~/artifacts directory if it doesn't exist
+          command: mkdir -p ~/artifacts
+      - run:
+          name: Copy artifacts
+          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
+      - store_artifacts:
+          path: ~/artifacts
+          destination: node-build
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: deploy
+          command: "#e.g. ./deploy.sh"
+      - run:
+          name: found github actions config
+          command: ":"
+      - run:
+          name: found gitlab workflows config
+          command: ":"
+
+workflows:
+  build-and-test:
+    jobs:
+      - test-node
+      - build-node:
+          requires:
+            - test-node
+    - deploy:
+        requires:
+          - build-node
+        filters:
+          branches:
+            only:
+              - main
+          events:
+            only:
+              - push
+              - merge
+        environment:
+          PRODUCTION: "true"
 
