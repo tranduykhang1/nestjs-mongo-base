@@ -42,12 +42,12 @@ workflows:
   build-and-test:
     jobs:
       - test-node
-      - build-node:
+      - build-image:
           requires:
             - test-node
       - deploy:
           requires:
-            - build-node
+            - build-image
           filters:
             branches:
               only:
