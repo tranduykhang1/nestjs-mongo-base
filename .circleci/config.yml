@@ -58,17 +58,17 @@ workflows:
       - build-node:
           requires:
             - test-node
-    - deploy:
-        requires:
-          - build-node
-        filters:
-          branches:
-            only:
-              - main
+      - deploy:
+          requires:
+            - build-node
+          filters:
+            branches:
+              only:
+                - main
           events:
             only:
               - push
               - merge
-        environment:
+          environment:
           PRODUCTION: "true"
 
