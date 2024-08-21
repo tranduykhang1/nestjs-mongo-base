@@ -27,7 +27,7 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
-          name: 'Build the Image'
+          name: "Build the Image"
           command: "echo 'Building the Image'"
 
   deploy:
@@ -52,10 +52,3 @@ workflows:
             branches:
               only:
                 - main
-          events:
-            only:
-              - push
-              - merge
-          environment:
-          PRODUCTION: "true"
-
