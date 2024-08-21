@@ -46,7 +46,7 @@ services:
   #   depends_on:
   #     - mongo
   #   ports:
-  #     - 27031:27017
+  #     - $MONGO_PORT_2:27017
   #   restart: always
   #   entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'rs0']
   #   networks:

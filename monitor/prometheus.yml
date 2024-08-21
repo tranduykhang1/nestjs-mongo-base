@@ -1,12 +1,6 @@
-global:
-  scrape_interval: 15s
-
 scrape_configs:
-  - job_name: api-service
-    scrape_interval: 15s
-    scrape_timeout: 10s
-    metrics_path: /metrics
+  - job_name: cadvisor
+    scrape_interval: 5s
     static_configs:
       - targets:
-          - "node-exporter:9100"
-          - "prometheus:9090"
+          - cadvisor:8080

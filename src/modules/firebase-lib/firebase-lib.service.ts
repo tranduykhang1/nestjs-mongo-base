@@ -1,18 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as firebase from 'firebase-admin';
-import * as serviceAccount from './auth/auth.json';
-import { AuthPayload } from './interface/auth.interface';
+import { existsSync } from 'fs';
 import { FirebaseAuthDto } from './dto/auth.dto';
+import { AuthPayload } from './interface/auth.interface';
 
 @Injectable()
 export class FirebaseLibService {
   private logger = new Logger(FirebaseLibService.name);
   constructor() {
-    firebase.initializeApp({
-      credential: firebase.credential.cert(
-        serviceAccount as firebase.ServiceAccount,
-      ),
-    });
+    const serviceAccountPath = './auth/auth.json';
+
+    if (!existsSync(serviceAccountPath)) {
+      this.logger.error('Firebase service account file not found');
+    } else {
+      firebase.initializeApp({
+        credential: firebase.credential.cert(serviceAccountPath),
+      });
+    }
   }
 
   async decodeAuthToken({

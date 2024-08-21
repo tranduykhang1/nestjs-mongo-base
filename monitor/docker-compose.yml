@@ -6,8 +6,6 @@ services:
     container_name: prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
-    ports:
-      - "9095:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
@@ -16,29 +14,29 @@ services:
     container_name: grafana
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_ROOT_URL=/monitor
     ports:
-      - "3040:3000"
+      - 3000
     depends_on:
       - prometheus
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
-    
-  node-exporter: 
-    image: prom/node-exporter:latest 
-    container_name: node-exporter 
-    restart: unless-stopped 
-    volumes: 
-      - /proc:/host/proc:ro 
-      - /sys:/host/sys:ro 
-      - /:/rootfs:ro 
-    command: 
-      - '--path.procfs=/host/proc' 
-      - '--path.rootfs=/rootfs' 
-      - '--path.sysfs=/host/sys' 
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)' 
-    ports: 
-      - 9100:9100 
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.38.6
+    privileged: true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
 
 volumes:
   grafana-data:
