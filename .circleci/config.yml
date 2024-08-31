@@ -4,20 +4,18 @@ orbs:
 
 jobs:
   test-node:
-    executor: node/default
+    docker:
+      - image: cimg/node:21
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
       - run:
-          name: Install
-          command: npm ci
-      - run:
-          name: Run build
-          command: npm run build
-      - run:
-          name: Run test
-          command: npm run test
+          name: Install - Build - Test
+          command: |
+            npm ci
+            npm run build
+            npm run test
+            npm run test:architect
+    
 
   build-image:
     docker:
