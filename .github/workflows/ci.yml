@@ -20,48 +20,48 @@ jobs:
         with:
           node-version: "21.x"
 
-      - name: Install - Build - Test
+      - name: Install - Test
         run: |
           npm ci
-          npm run build
           npm run test
+          npm run test:architect
 
-  build:
-    if: |
-      github.ref == 'refs/heads/staging' ||
-      github.ref == 'refs/heads/main'
-    runs-on: ubuntu-22.04
-    needs: [test]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+  # build:
+  #   if: |
+  #     github.ref == 'refs/heads/staging' ||
+  #     github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-22.04
+  #   needs: [test]
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 1
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{secrets.DOCKER_HUB_US}}
-          password: ${{secrets.DOCKER_HUB_AT}}
+  #     - name: Login to DockerHub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{secrets.DOCKER_HUB_US}}
+  #         password: ${{secrets.DOCKER_HUB_AT}}
 
-      - name: Build docker image
-        run: docker build -t ${{secrets.DOCKER_HUB_US}}/demo-github-action:latest -f Dockerfile.pro .
+  #     - name: Build docker image
+  #       run: docker build -t ${{secrets.DOCKER_HUB_US}}/demo-github-action:latest -f Dockerfile.pro .
 
-      - name: Push docker image
-        run: docker push ${{secrets.DOCKER_HUB_US}}/demo-github-action:latest
+  #     - name: Push docker image
+  #       run: docker push ${{secrets.DOCKER_HUB_US}}/demo-github-action:latest
 
-      - name: Update image metadata
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ secrets.DOCKER_HUB_US }}/demo-github-action:latest
-          tags: |
-            type=sha
-          labels: |
-            org.opencontainers.image.title=Base Nest Example
-            org.opencontainers.image.description=Example NestJS github action application
-            org.opencontainers.image.url=https://github.com/${{github.repository}}
-            org.opencontainers.image.revision=${{github.sha}}
-            org.opencontainers.image.licenses=MIT
+  #     - name: Update image metadata
+  #       uses: docker/metadata-action@v5
+  #       with:
+  #         images: ${{ secrets.DOCKER_HUB_US }}/demo-github-action:latest
+  #         tags: |
+  #           type=sha
+  #         labels: |
+  #           org.opencontainers.image.title=Base Nest Example
+  #           org.opencontainers.image.description=Example NestJS github action application
+  #           org.opencontainers.image.url=https://github.com/${{github.repository}}
+  #           org.opencontainers.image.revision=${{github.sha}}
+  #           org.opencontainers.image.licenses=MIT
