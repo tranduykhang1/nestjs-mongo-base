@@ -1,58 +1,63 @@
 version: 2.1
-
 orbs:
   node: circleci/node@5
 
+jobs:
+  test-node:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Install
+          command: rm -rf node_modules && npm install
+      - run:
+          name: Run build
+          command: npm run build
+      - run:
+          name: Run test
+          command: npm run test
+      - run:
+          name: Run test:architect
+          command: npm run test:architect
+
+  build-image:
+    docker:
+      - image: node:21
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: "Build the Image"
+          command: "make up-prod"
+
+  deploy:
+    docker:
+      - image: node:21
+    steps:
+      - run:
+          name: Deploy
+          command: "Deploying"
+          # command: |
+          #   ssh -o StrictHostKeyChecking=no \
+          #       -o UserKnownHostsFile=/dev/null \
+          #       -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} \
+          #       ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} \
+          #       "cd ${{ secrets.SERVER_PATH }} && make re-deploy"
+
 workflows:
-  build:
+  build-and-test:
     jobs:
-      - node/test
-      - build:
+      - test-node
+      - build-image:
           requires:
-            - node/test
+            - test-node
+      - deploy:
+          requires:
+            - build-image
           filters:
             branches:
               only:
-                - staging
                 - main
-
-jobs:
-  test:
-    docker:
-      - image: cimg/node:21
-    steps:
-      - checkout
-      - run:
-          name: Install - Build - Test
-          command: |
-            npm ci
-            npm run build
-            npm run test
-            npm run test:architect
-
-  build:
-    docker:
-      - image: cimg/node:21
-    steps:
-      - checkout
-      - run:
-          name: Docker build
-          command: echo "Building image"
-      # - run:
-      #     name: Set up Docker Buildx
-      #     command: docker buildx install
-      # - run:
-      #     name: Login to DockerHub
-      #     command: |
-      #       echo "${DOCKER_HUB_AT}" | docker login -u "${DOCKER_HUB_US}" --password-stdin
-      # - run:
-      #     name: Build docker image
-      #     command: docker build -t "${DOCKER_HUB_US}/demo-github-action:latest" -f Dockerfile.pro .
-      # - run:
-      #     name: Push docker image
-      #     command: docker push "${DOCKER_HUB_US}/demo-github-action:latest"
-      # - run:
-      #     name: Update image metadata
-      #     command: |
-      #       docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workspace jimmidyson/metadata-action:latest --images "${DOCKER_HUB_US}/demo-github-action:latest" --tags type=sha --labels "org.opencontainers.image.title=Base Nest Example,org.opencontainers.image.description=Example NestJS github action application,org.opencontainers.image.url=https://github.com/${CIRCLE_PROJECT_REPONAME},org.opencontainers.image.revision=${CIRCLE_SHA1},org.opencontainers.image.licenses=MIT"
-
