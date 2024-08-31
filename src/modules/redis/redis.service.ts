@@ -1,7 +1,7 @@
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Injectable } from '@nestjs/common';
 import { Redis } from 'ioredis';
-import { Nullable } from 'src/common/types/types';
+import { Nullable } from 'src/common/types/common.type';
 
 @Injectable()
 export class RedisService {

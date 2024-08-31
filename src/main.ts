@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { WinstonModule } from 'nest-winston';
 import { appConfig } from './app.config';
 import { AppModule } from './app.module';
-import logger from './common/logger/winston.logger';
+import logger from './common/loggers/winston.logger';
 import { AppClusterConfig } from './utils/app-cluster-config';
 import { ApiDocProtected } from './utils/swagger.auth';
 

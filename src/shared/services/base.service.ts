@@ -1,9 +1,9 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { FilterQuery } from 'mongoose';
-import { Nullable } from 'src/common/types/types';
 import { BaseError } from '../errors/base.error';
 import { Errors } from '../errors/constants.error';
 import { BaseRepository } from '../repositories/base.repository';
+import { Nullable } from 'src/common/types/common.type';
 
 export class BaseService<T> {
   private readonly modelName: string;

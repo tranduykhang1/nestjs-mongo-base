@@ -1,7 +1,7 @@
 import { FilterQuery, Model, PipelineStage } from 'mongoose';
 import { appConfig } from 'src/app.config';
-import { Nullable } from 'src/common/types/types';
 import { SORT_FIELD, SORT_ORDER } from '../enums/sort.enum';
+import { Nullable } from 'src/common/types/common.type';
 
 export class BaseRepository<T> {
   private readonly modelName: string;

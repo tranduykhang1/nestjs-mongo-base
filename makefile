@@ -9,22 +9,22 @@ NC := \033[0m
 help:
 	@echo "Available commands:"
 	@echo ""
-	@echo "$(GREEN)  db-backup   $(NC) - Backup the database (Not implemented)"
-	@echo "$(GREEN)  db-restore  $(NC) - Restore the database (Not implemented)"
-	@echo "$(GREEN)  up          $(NC) - (Docker) Start all services in detached mode"
-	@echo "$(GREEN)  up-prod     $(NC) - (Docker) Start all services in detached mode for production"
-	@echo "$(GREEN)  build-prod  $(NC) - (Docker) Build and start all services in detached mode for production"
-	@echo "$(GREEN)  build       $(NC) - (Docker) Build and start all services in detached mode"
-	@echo "$(GREEN)  api-logs    $(NC) - (Docker) Tail logs for the ${API_NAME} container"
-	@echo "$(GREEN)  api-exec    $(NC) - (Docker) Open a shell inside the ${API_NAME} container"
-	@echo "$(GREEN)  api-restart $(NC) - (Docker) Restart the ${API_NAME} container"
-	@echo "$(GREEN)  down        $(NC) - (Docker) Stop all services"
-	@echo "$(GREEN)  down-clear  $(NC) - (Docker for dev) Stop all services and remove volumes"
-	@echo "$(GREEN)  mongo-init  $(NC) - Initialize MongoDB using the setup script"
-	@echo "$(GREEN)  unit-test   $(NC) - Run unit tests"
-	@echo "$(GREEN)  e2e-test    $(NC) - Run end-to-end tests"
-	@echo "$(GREEN)  seed        $(NC) - Seed the database"
-
+	@echo "$(GREEN)  db-backup        $(NC) - Backup the database (Not implemented)"
+	@echo "$(GREEN)  db-restore       $(NC) - Restore the database (Not implemented)"
+	@echo "$(GREEN)  up               $(NC) - (Docker) Start all services in detached mode"
+	@echo "$(GREEN)  up-prod          $(NC) - (Docker) Start all services in detached mode for production"
+	@echo "$(GREEN)  build-prod       $(NC) - (Docker) Build and start all services in detached mode for production"
+	@echo "$(GREEN)  build            $(NC) - (Docker) Build and start all services in detached mode"
+	@echo "$(GREEN)  api-logs         $(NC) - (Docker) Tail logs for the ${API_NAME} container"
+	@echo "$(GREEN)  api-exec         $(NC) - (Docker) Open a shell inside the ${API_NAME} container"
+	@echo "$(GREEN)  api-restart      $(NC) - (Docker) Restart the ${API_NAME} container"
+	@echo "$(GREEN)  down             $(NC) - (Docker) Stop all services"
+	@echo "$(GREEN)  down-clear       $(NC) - (Docker for dev) Stop all services and remove volumes"
+	@echo "$(GREEN)  mongo-init       $(NC) - Initialize MongoDB using the setup script"
+	@echo "$(GREEN)  unit-test        $(NC) - Run unit tests"
+	@echo "$(GREEN)  e2e-test         $(NC) - Run end-to-end tests"
+	@echo "$(GREEN)  architect-test   $(NC) - Run architect testing"
+	@echo "$(GREEN)  seed             $(NC) - Seed the database"
 
 db-backup:
 	sh ./mongo-setup/backup.sh
@@ -77,6 +77,9 @@ unit-test:
 
 e2e-test:
 	npm run test:e2e
+
+architect-test:
+	npm run test:architect
 
 seed:
 	npm run seed:refresh
