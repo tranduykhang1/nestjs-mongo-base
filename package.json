@@ -20,6 +20,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "NODE_ENV=e2e-test jest --config  ./tests/jest-e2e.json --forceExit",
+    "test:architect": "NODE_ENV=test jest  --config ./tests/architect/jest-architect.json",
     "seed": "docker compose exec api node dist/src/seed",
     "seed:refresh": "docker compose exec api node dist/src/seed --refresh",
     "prepare": "husky install"

@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@5
+
 jobs:
   test-node:
     executor: node/default
@@ -21,22 +22,29 @@ jobs:
           command: npm run test
 
   build-image:
-    executor: node/default
+    docker:
+      - image: node:21
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: npm
       - run:
           name: "Build the Image"
-          command: "echo 'Building the Image'"
+          command: "make up-prod"
 
   deploy:
     docker:
-      - image: cimg/base:stable
+      - image: node:21
     steps:
       - run:
-          name: deploy
-          command: "echo 'Deploying'"
+          name: Deploy
+          command: 'Deploying'
+          # command: |
+          #   ssh -o StrictHostKeyChecking=no \
+          #       -o UserKnownHostsFile=/dev/null \
+          #       -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} \
+          #       ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} \
+          #       "cd ${{ secrets.SERVER_PATH }} && make re-deploy"
 
 workflows:
   build-and-test:
