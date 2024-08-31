@@ -23,7 +23,7 @@ help:
 	@echo "$(GREEN)  mongo-init       $(NC) - Initialize MongoDB using the setup script"
 	@echo "$(GREEN)  unit-test        $(NC) - Run unit tests"
 	@echo "$(GREEN)  e2e-test         $(NC) - Run end-to-end tests"
-	@echo "$(GREEN)  e2e-architect    $(NC) - Run architect testing"
+	@echo "$(GREEN)  architect-test   $(NC) - Run architect testing"
 	@echo "$(GREEN)  seed             $(NC) - Seed the database"
 
 db-backup:
