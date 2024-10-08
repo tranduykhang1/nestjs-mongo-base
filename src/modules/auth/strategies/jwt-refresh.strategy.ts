@@ -12,13 +12,17 @@ import {
   RefreshTokenPayload,
   TokenPayload,
 } from '../interfaces/tokenPayload.interface';
+import { UserSessionsService } from 'src/modules/user-sessions/user-sessions.service';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
   Strategy,
   'jwt-refresh-token',
 ) {
-  constructor(private redisService: RedisService) {
+  constructor(
+    private redisService: RedisService,
+    private userSessionsService: UserSessionsService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromBodyField('token'),
       ignoreExpiration: false,
@@ -38,6 +42,17 @@ export class JwtRefreshStrategy extends PassportStrategy(
         throw new BaseError({
           ...Errors.MISSED_TOKEN,
           statusCode: HttpStatus.UNAUTHORIZED,
+        });
+      }
+
+      const session = await this.userSessionsService.findOne({
+        refreshToken: token,
+      });
+
+      if (!session) {
+        throw new BaseError({
+          ...Errors.INVALID_SESSION,
+          statusCode: HttpStatus.CONFLICT,
         });
       }
 
@@ -62,10 +77,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
         statusCode: HttpStatus.UNAUTHORIZED,
       });
     } catch (err) {
-      throw new BaseError({
-        ...Errors.UNAUTHORIZED,
-        statusCode: HttpStatus.UNAUTHORIZED,
-      });
+      throw err;
     }
   }
 }

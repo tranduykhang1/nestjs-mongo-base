@@ -49,4 +49,12 @@ export const Errors = {
     errorCode: 10007,
     message: 'missed token!',
   },
+  LOGIN_WITH_ANOTHER_DEVICE: {
+    errorCode: 10008,
+    message: 'login with another device!',
+  },
+  INVALID_SESSION: {
+    errorCode: 10009,
+    message: 'invalid session!',
+  },
 };
