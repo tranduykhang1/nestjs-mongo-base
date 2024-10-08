@@ -9,6 +9,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { UserSessionsModule } from '../user-sessions/user-sessions.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
     RedisModule,
     BullQueueModule,
+    UserSessionsModule,
   ],
   providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
   exports: [AuthService],

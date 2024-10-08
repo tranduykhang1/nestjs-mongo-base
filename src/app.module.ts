@@ -17,6 +17,7 @@ import { UsersModule } from './modules/users/users.module';
 import { BullQueueModule } from './modules/bull-queue/bull-queue.module';
 import { MailingModule } from './modules/mailing/mailing.module';
 import { FirebaseLibModule } from './modules/firebase-lib/firebase-lib.module';
+import { UserSessionsModule } from './modules/user-sessions/user-sessions.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { FirebaseLibModule } from './modules/firebase-lib/firebase-lib.module';
     BullQueueModule,
     MailingModule,
     FirebaseLibModule,
+    UserSessionsModule,
   ],
   providers: [
     {

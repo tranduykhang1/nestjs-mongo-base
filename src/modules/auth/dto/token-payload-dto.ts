@@ -6,4 +6,7 @@ export class LoginResponse {
 
   @ApiProperty({ type: String })
   rt: string;
+
+  @ApiProperty({ type: String })
+  session?: string;
 }

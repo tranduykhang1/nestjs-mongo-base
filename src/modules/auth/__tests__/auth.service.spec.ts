@@ -10,12 +10,15 @@ import { AuthService } from '../auth.service';
 import { LoginDto } from '../dto/login-dto';
 import { RegisterDto } from '../dto/register-dto';
 import { TokenPayload } from '../interfaces/tokenPayload.interface';
+import { UserSessionsService } from 'src/modules/user-sessions/user-sessions.service';
+import { UserSession } from 'src/modules/user-sessions/entities/user-session.entity';
 
 describe('AuthService', () => {
   let authService: AuthService,
     jwtService: jest.Mocked<JwtService>,
     userService: jest.Mocked<UsersService>,
-    mailQueueProducer: jest.Mocked<MailQueueProducer>;
+    mailQueueProducer: jest.Mocked<MailQueueProducer>,
+    userSessionService: jest.Mocked<UserSessionsService>;
 
   beforeAll(() => {
     const { unit, unitRef } = TestBed.create(AuthService).compile();
@@ -23,6 +26,7 @@ describe('AuthService', () => {
     jwtService = unitRef.get(JwtService);
     userService = unitRef.get(UsersService);
     mailQueueProducer = unitRef.get(MailQueueProducer);
+    userSessionService = unitRef.get(UserSessionsService);
   });
 
   it('should be defined', () => {
@@ -63,6 +67,10 @@ describe('AuthService', () => {
       userService.findOne.mockResolvedValueOnce({
         email: 'return@gmail.com',
       } as any);
+      userSessionService.checkSession.mockResolvedValueOnce(undefined);
+      userSessionService.createByUser.mockResolvedValueOnce({
+        session: 'session-id',
+      } as UserSession);
       jest.spyOn(Password, 'compare').mockReturnValueOnce(true);
 
       const result: any = await authService.login(input);

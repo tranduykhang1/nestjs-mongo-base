@@ -14,6 +14,7 @@ import { LoginDto } from './dto/login-dto';
 import { RegisterDto } from './dto/register-dto';
 import { LoginResponse } from './dto/token-payload-dto';
 import { TokenPayload } from './interfaces/tokenPayload.interface';
+import { UserSessionsService } from '../user-sessions/user-sessions.service';
 
 @Injectable()
 export class AuthService {
@@ -22,9 +23,10 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly redisServices: RedisService,
     private readonly mailQueueProducer: MailQueueProducer,
+    private readonly userSessionsService: UserSessionsService,
   ) {}
 
-  signToken(payload: TokenPayload): LoginResponse {
+  signToken(payload: TokenPayload): Omit<LoginResponse, 'session'> {
     return {
       at: this.jwtService.sign(payload),
       rt: this.jwtService.sign({ uid: payload.uid }),
@@ -42,13 +44,17 @@ export class AuthService {
           throw new BaseError(Errors.WRONG_CREDENTIALS);
         }
 
+        await this.userSessionsService.checkSession(user._id);
+
         const payload: TokenPayload = {
           uid: user._id,
           rol: user.role,
           ema: user.email,
         };
 
-        const data = this.signToken(payload);
+        const data = this.signToken(payload),
+          session = this.userSessionsService.generateSession(user._id);
+
         await Promise.all([
           this.usersService.update({ email }, { lastActivity: new Date() }),
           this.redisServices.set(
@@ -56,6 +62,11 @@ export class AuthService {
             data,
             REDIS_TTL.AUTH_LOGIN,
           ),
+          this.userSessionsService.createByUser({
+            userId: user._id,
+            refreshToken: data.rt,
+            session,
+          }),
         ]);
 
         return {
@@ -102,8 +113,15 @@ export class AuthService {
       rol: user.role,
       ema: user.email,
     };
+    const data = this.signToken(payload);
+
+    await this.userSessionsService.update(
+      { userId },
+      { refreshToken: data.rt },
+    );
+
     return {
-      data: this.signToken(payload),
+      data,
     };
   }
 
