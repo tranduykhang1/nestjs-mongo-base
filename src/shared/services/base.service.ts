@@ -1,11 +1,16 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { FilterQuery } from 'mongoose';
+import { Nullable } from 'src/common/types/common.type';
+import {
+  DeepPartial,
+  FindOneOptions,
+  FindOptionsWhere,
+  ObjectLiteral,
+} from 'typeorm';
 import { BaseError } from '../errors/base.error';
 import { Errors } from '../errors/constants.error';
 import { BaseRepository } from '../repositories/base.repository';
-import { Nullable } from 'src/common/types/common.type';
 
-export class BaseService<T> {
+export class BaseService<T extends ObjectLiteral> {
   private readonly modelName: string;
   private readonly serviceLogger = new Logger(BaseService.name);
 
@@ -13,9 +18,9 @@ export class BaseService<T> {
     this.repository = repository;
   }
 
-  async create(input: FilterQuery<T>, createdBy = ''): Promise<T> {
+  async create(input: DeepPartial<T>, createdBy = ''): Promise<T> {
     try {
-      const createInput = { ...input, createdBy };
+      const createInput: DeepPartial<T> = { ...input, createdBy };
       const createdData = await this.repository.create(createInput);
       if (!createdData)
         throw new BadRequestException(
@@ -27,11 +32,14 @@ export class BaseService<T> {
     }
   }
 
-  async findOne(filter: FilterQuery<T>): Promise<Nullable<T>> {
+  async findOne(
+    filter: FindOptionsWhere<T>,
+    options?: FindOneOptions<T>,
+  ): Promise<Nullable<T>> {
     try {
-      const queryFilter: FilterQuery<T> = { ...filter };
+      const queryFilter: FindOptionsWhere<T> = { ...filter };
 
-      const result = await this.repository.findOne(queryFilter);
+      const result = await this.repository.findOne(queryFilter, options);
 
       return result ?? null;
     } catch (err) {
@@ -39,9 +47,9 @@ export class BaseService<T> {
     }
   }
 
-  async findOneUseStrict(filter: FilterQuery<T>): Promise<T> {
+  async findOneUseStrict(filter: FindOptionsWhere<T>): Promise<T> {
     try {
-      const queryFilter: FilterQuery<T> = { ...filter };
+      const queryFilter: FindOptionsWhere<T> = { ...filter };
 
       const result = await this.repository.findOne(queryFilter);
 
@@ -53,7 +61,7 @@ export class BaseService<T> {
     }
   }
 
-  async findLastOne(filter: FilterQuery<T>): Promise<Nullable<T>> {
+  async findLastOne(filter: FindOptionsWhere<T>): Promise<Nullable<T>> {
     try {
       const result = await this.repository.findLastOne(filter);
 
@@ -64,8 +72,8 @@ export class BaseService<T> {
   }
 
   async update(
-    filter: FilterQuery<T>,
-    input: Partial<Record<keyof T, unknown>>,
+    filter: FindOptionsWhere<T>,
+    input: Partial<T>,
     updatedBy = '',
   ): Promise<T> {
     try {
@@ -90,7 +98,7 @@ export class BaseService<T> {
           deletedAt: new Date(),
           isDeleted: true,
           deletedBy,
-        }),
+        } as unknown as Partial<T>),
       ]);
       if (!foundDocument)
         throw new BadRequestException(`${this.modelName} not found`);
@@ -107,9 +115,9 @@ export class BaseService<T> {
     }
   }
 
-  async count(filter: FilterQuery<T>): Promise<number> {
+  async count(filter: FindOptionsWhere<T>): Promise<number> {
     try {
-      return await this.repository.count({ ...filter });
+      return await this.repository.count(filter);
     } catch (err) {
       throw this.handleServiceError(err, `Count ${this.modelName}`);
     }

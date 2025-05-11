@@ -1,19 +1,6 @@
-import { MongooseModule } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { seeder } from 'nestjs-seeder';
-import { appConfig } from './app.config';
-import { User, UserSchema } from './modules/users/entity/user.entity';
 import { seeders } from './modules/seeder';
+import { User } from './modules/users/entity/user.entity';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-mongoose.plugin(require('mongoose-nanoid'), {
-  length: 24,
-  alphabets: '1234567890',
-});
-
-seeder({
-  imports: [
-    MongooseModule.forRoot(appConfig.mongoURI),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-  ],
-}).run(seeders);
+seeder({ imports: [TypeOrmModule.forFeature([User])] }).run(seeders);

@@ -8,13 +8,13 @@ import { BaseResponse } from 'src/shared/responses/base.response';
 import { Password } from 'src/utils/password';
 import { MailQueueProducer } from '../bull-queue/mail-queue/mail-queue.producer';
 import { RedisService } from '../redis/redis.service';
+import { UserSessionsService } from '../user-sessions/user-sessions.service';
 import { User } from '../users/entity/user.entity';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login-dto';
 import { RegisterDto } from './dto/register-dto';
 import { LoginResponse } from './dto/token-payload-dto';
 import { TokenPayload } from './interfaces/tokenPayload.interface';
-import { UserSessionsService } from '../user-sessions/user-sessions.service';
 
 @Injectable()
 export class AuthService {
@@ -44,34 +44,32 @@ export class AuthService {
           throw new BaseError(Errors.WRONG_CREDENTIALS);
         }
 
-        await this.userSessionsService.checkSession(user._id);
+        await this.userSessionsService.checkSession(user.id);
 
         const payload: TokenPayload = {
-          uid: user._id,
+          uid: user.id,
           rol: user.role,
           ema: user.email,
         };
 
         const data = this.signToken(payload),
-          session = this.userSessionsService.generateSession(user._id);
+          session = this.userSessionsService.generateSession(user.id);
 
         await Promise.all([
           this.usersService.update({ email }, { lastActivity: new Date() }),
           this.redisServices.set(
-            `${REDIS_KEY.AUTH_LOGIN}${user._id}`,
+            `${REDIS_KEY.AUTH_LOGIN}${user.id}`,
             data,
             REDIS_TTL.AUTH_LOGIN,
           ),
           this.userSessionsService.createByUser({
-            userId: user._id,
+            userId: user.id,
             refreshToken: data.rt,
             session,
           }),
         ]);
 
-        return {
-          data,
-        };
+        return { data };
       }
       throw new BaseError(Errors.WRONG_CREDENTIALS);
     } catch (err) {
@@ -97,19 +95,16 @@ export class AuthService {
       const verificationKey = await this.signVerificationToken();
       this.mailQueueProducer.sendRegistration(email, verificationKey);
 
-      return {
-        message: 'Verification link has been sent',
-        data: user,
-      };
+      return { message: 'Verification link has been sent', data: user };
     } catch (err) {
       throw err;
     }
   }
 
   async refreshToken(userId: string): Promise<BaseResponse<LoginResponse>> {
-    const user = await this.usersService.findOneUseStrict({ _id: userId });
+    const user = await this.usersService.findOneUseStrict({ id: userId });
     const payload: TokenPayload = {
-      uid: user._id,
+      uid: user.id,
       rol: user.role,
       ema: user.email,
     };
@@ -120,9 +115,7 @@ export class AuthService {
       { refreshToken: data.rt },
     );
 
-    return {
-      data,
-    };
+    return { data };
   }
 
   signVerificationToken(): string {

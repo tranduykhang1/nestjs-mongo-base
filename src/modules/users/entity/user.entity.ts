@@ -1,50 +1,27 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
-import { HydratedDocument } from 'mongoose';
 import { BaseEntity } from 'src/shared/entities/base.entity.';
 import { USER_ROLE } from 'src/shared/enums/user.enum';
+import { Column, Entity } from 'typeorm';
 
-export type UserDocument = HydratedDocument<User>;
-
-@Schema({ timestamps: true })
+@Entity()
 export class User extends BaseEntity {
-  @Prop({ minlength: 3, maxlength: 30 })
-  @ApiProperty()
+  @Column({ length: 30 })
   firstName: string;
 
-  @Prop({ minlength: 3, maxlength: 30 })
-  @ApiProperty()
+  @Column({ length: 30 })
   lastName: string;
 
-  @Prop({ unique: true })
-  @ApiProperty()
+  @Column({ unique: true })
   email: string;
 
-  @Prop()
-  @ApiProperty()
+  @Column()
   key: string;
 
-  @Prop({ minlength: 6 })
-  @ApiProperty()
+  @Column({ length: 255 })
   password: string;
 
-  @Prop({ enum: USER_ROLE, default: USER_ROLE.USER })
-  @ApiProperty({ enum: USER_ROLE, default: USER_ROLE.USER })
+  @Column({ type: 'enum', enum: USER_ROLE, default: USER_ROLE.USER })
   role: USER_ROLE;
 
-  @Prop({ default: null })
-  @ApiProperty({ example: new Date() })
+  @Column({ type: 'timestamp', nullable: true, default: null })
   lastActivity: Date;
 }
-
-export const UserSchema = SchemaFactory.createForClass(User);
-
-UserSchema.index({ email: 1 }, { unique: true });
-
-UserSchema.set('toJSON', {
-  transform: function (doc, res) {
-    delete res.password;
-    delete res.key;
-    return res;
-  },
-});

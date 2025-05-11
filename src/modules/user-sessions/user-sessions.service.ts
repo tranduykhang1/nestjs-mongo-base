@@ -41,13 +41,7 @@ export class UserSessionsService extends BaseService<UserSession> {
 
   async disable(userId: string): Promise<UserSession> {
     try {
-      return await this.update(
-        {
-          userId,
-          isActive: true,
-        },
-        { isActive: false },
-      );
+      return await this.update({ userId, isActive: true }, { isActive: false });
     } catch (err) {
       throw err;
     }

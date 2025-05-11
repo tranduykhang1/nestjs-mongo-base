@@ -1,17 +1,21 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 type EnvConfig = {
   nodeEnv: string | undefined;
   name: string;
   version: string;
   apiVersion: string;
   apiPort: string | number;
-  mongoURI: string;
-  mongoPort: string | number;
+  pgHost: string | undefined;
+  pgPort: number;
+  pgUser: string | undefined;
+  pgPassword: string | undefined;
+  pgDatabase: string | undefined;
   jwtExpiresIn: string;
   jwtSecret: string;
   jwtRefreshSecret: string;
   jwtRefreshExp: string;
-  fileHost: string | undefined;
-  fileRoot: string | undefined;
   pwSecret: string;
   baseUrl: string;
   apiAuthUserName: string | undefined;
@@ -25,6 +29,8 @@ type EnvConfig = {
   redisDB: number | string;
   supportEmailPw: string;
   supportEmail: string;
+  minioRootUser: string;
+  minioRootPassword: string;
 };
 
 const devEnv: EnvConfig = {
@@ -33,27 +39,30 @@ const devEnv: EnvConfig = {
   version: process.env.APP_VERSION || '0.0.1',
   apiVersion: process.env.API_VERSION || '1',
   apiPort: process.env.API_PORT || 3000,
-  mongoURI: process.env.MONGO_URI || 'mongodb://localhost:27017/dev_db',
-  mongoPort: process.env.MONGO_PORT || 27017,
+  pgHost: process.env.PG_HOST || 'db',
+  pgPort: +process.env.PG_PORT! || 5432,
+  pgUser: process.env.PG_USER || 'adminhelp',
+  pgPassword: process.env.PG_PASSWORD || 'secretadminhelp',
+  pgDatabase: process.env.PG_DATABASE || 'main',
   jwtExpiresIn: process.env.AT_EXPIRE || '1d',
   jwtSecret: process.env.JWT_SECRET || 'defaultSecret',
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || 'defaultRefreshSecret',
   jwtRefreshExp: process.env.RT_EXPIRE || '7d',
-  fileHost: process.env.FILE_HOST,
-  fileRoot: process.env.FILE_ROOT,
   pwSecret: process.env.PW_SECRET || 'defaultPWSecret',
   baseUrl: process.env.BASE_URL || 'http://localhost:3000',
   apiAuthUserName: process.env.API_AUTH_USERNAME,
   apiAuthPassword: process.env.API_AUTH_PASSWORD,
   maxWorkers: process.env.MAX_WORKERS || '1',
-  throttleTTL: +process.env.THROTTLE_TTL!,
-  throttleLimit: +process.env.THROTTLE_LIMIT!,
+  throttleTTL: +process.env.THROTTLE_TTL! || 60,
+  throttleLimit: +process.env.THROTTLE_LIMIT! || 10,
   redisPass: process.env.REDIS_PASSWORD || 'defaultRedisPass',
   redisHost: process.env.REDIS_HOST || 'localhost',
   redisPort: process.env.REDIS_PORT || 6379,
   redisDB: process.env.REDIS_DB || 0,
   supportEmailPw: process.env.SUPPORT_EMAIL_PW!,
   supportEmail: process.env.SUPPORT_EMAIL!,
+  minioRootUser: process.env.MINIO_ROOT_USER || 'minioadmin',
+  minioRootPassword: process.env.MINIO_ROOT_PASSWORD || 'minioadmin',
 };
 
 const testEnv: EnvConfig = {
@@ -62,15 +71,15 @@ const testEnv: EnvConfig = {
   version: '1.0.0',
   apiVersion: '1',
   apiPort: 8084,
-  mongoURI:
-    'mongodb://superadmin:secret-admin-string@localhost:27030/test?authSource=admin&directConnection=true',
-  mongoPort: 27017,
+  pgHost: 'localhost',
+  pgPort: 5432,
+  pgUser: 'postgres',
+  pgPassword: 'postgres',
+  pgDatabase: 'test',
   jwtExpiresIn: '1d',
   jwtSecret: 'testSecret',
   jwtRefreshSecret: 'testRefreshSecret',
   jwtRefreshExp: '7d',
-  fileHost: undefined,
-  fileRoot: undefined,
   pwSecret: 'testPWSecret',
   baseUrl: 'http://localhost:8084',
   apiAuthUserName: 'admin',
@@ -84,6 +93,8 @@ const testEnv: EnvConfig = {
   redisDB: 1,
   supportEmailPw: 'pw',
   supportEmail: 'email@email.com',
+  minioRootUser: 'minioadmin',
+  minioRootPassword: 'minioadmin',
 };
 
 export const appConfig: EnvConfig =

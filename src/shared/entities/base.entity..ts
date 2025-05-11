@@ -1,27 +1,36 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+} from 'typeorm';
+import { User } from '../../modules/users/entity/user.entity';
 
-@Schema({ timestamps: true, versionKey: false })
+@Entity()
 export class BaseEntity {
-  _id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Prop()
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Prop()
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @Prop({ default: '' })
-  createdBy: string;
+  @ManyToOne(() => User, (user) => user.id, { nullable: true })
+  createdBy: User;
 
-  @Prop({ default: '' })
-  updatedBy: string;
+  @ManyToOne(() => User, (user) => user.id, { nullable: true })
+  updatedBy: User;
 
-  @Prop({ default: null })
+  @Column({ type: 'timestamp', nullable: true, default: null })
   deletedAt: Date;
 
-  @Prop({ default: '' })
-  deletedBy: string;
+  @ManyToOne(() => User, (user) => user.id, { nullable: true })
+  deletedBy: User;
 
-  @Prop({ default: false })
+  @Column({ default: false })
   isDeleted: boolean;
 }

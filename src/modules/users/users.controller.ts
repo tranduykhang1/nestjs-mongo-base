@@ -12,11 +12,9 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @ApiOkResponse({
-    type: SwgSuccessResponse<User>,
-  })
+  @ApiOkResponse({ type: SwgSuccessResponse<User> })
   @Get('/me')
   async getMe(@CurrentUser() { uid }: TokenPayload) {
-    return this.userService.findOne({ _id: uid });
+    return this.userService.findOne({ id: uid });
   }
 }

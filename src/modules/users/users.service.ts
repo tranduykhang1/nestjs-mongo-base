@@ -1,4 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from '../../shared/services/base.service';
 import { User } from './entity/user.entity';
 import { UsersRepository } from './user.repository';
@@ -6,7 +7,7 @@ import { UsersRepository } from './user.repository';
 @Injectable()
 export class UsersService extends BaseService<User> {
   constructor(
-    @Inject(UsersRepository) private usersRepository: UsersRepository,
+    @InjectRepository(User) private usersRepository: UsersRepository,
   ) {
     super(usersRepository);
   }
