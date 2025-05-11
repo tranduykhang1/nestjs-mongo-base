@@ -67,7 +67,7 @@ export class BaseService<T> {
     filter: FilterQuery<T>,
     input: Partial<Record<keyof T, unknown>>,
     updatedBy = '',
-  ): Promise<Nullable<T>> {
+  ): Promise<T> {
     try {
       const updateInput = { ...input, updatedBy };
       const result = await this.repository.update(filter, updateInput);

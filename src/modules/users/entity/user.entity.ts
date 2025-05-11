@@ -39,6 +39,8 @@ export class User extends BaseEntity {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
+UserSchema.index({ email: 1 }, { unique: true });
+
 UserSchema.set('toJSON', {
   transform: function (doc, res) {
     delete res.password;
